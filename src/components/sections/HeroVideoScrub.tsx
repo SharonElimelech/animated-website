@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   motion,
   useScroll,
+  useSpring,
   useTransform,
   useMotionValueEvent,
 } from "framer-motion";
@@ -12,20 +13,22 @@ const EASE = [0.16, 1, 0.3, 1] as const;
 
 /**
  * Apple-style scroll-scrubbed hero.
- * The video's `currentTime` is bound to scroll progress through a 320vh track,
- * driven by a single requestAnimationFrame loop that:
- *   - smooths (lerps) toward the target time for buttery motion, and
- *   - frame-skips: only writes `currentTime` when the delta exceeds one frame,
- *     so a 4K source stays at 60fps instead of thrashing the decoder.
+ *
+ * Smoothness strategy (the reason it no longer lags):
+ *  1. SPRING the scroll progress — the value driving everything is fluid,
+ *     not a raw jittery scroll position.
+ *  2. GATE every seek on the `seeked` event — we never issue a new
+ *     `currentTime` write while the decoder is still serving the last one,
+ *     so seeks can't pile up.
+ *  3. SNAP target time to a coarse grid — fewer distinct seek targets means
+ *     the decoder reuses decoded frames instead of thrashing on a 4K source.
+ *  4. PARALLAX scale on the video runs on the compositor every frame, so the
+ *     motion reads as continuous even between discrete video seeks.
  */
 export default function HeroVideoScrub() {
   const sectionRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
-
-  const progress = useRef(0); // latest scroll progress (0–1)
-  const rendered = useRef(0); // smoothed time currently shown
-  const durationRef = useRef(0);
-
+  const progress = useRef(0); // latest smoothed progress (0–1)
   const [videoOk, setVideoOk] = useState(true);
 
   const { scrollYProgress } = useScroll({
@@ -33,49 +36,72 @@ export default function HeroVideoScrub() {
     offset: ["start start", "end end"],
   });
 
-  useMotionValueEvent(scrollYProgress, "change", (v) => {
+  // 1) Spring-smoothed progress — buttery input for both scrub and parallax
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 110,
+    damping: 28,
+    mass: 0.35,
+    restDelta: 0.0001,
+  });
+
+  useMotionValueEvent(smoothProgress, "change", (v) => {
     progress.current = v;
   });
 
-  /* Hero copy choreography — fades & lifts away as the structure "locks in" */
-  const textOpacity = useTransform(scrollYProgress, [0, 0.16, 0.3], [1, 1, 0]);
-  const textY = useTransform(scrollYProgress, [0, 0.3], [0, -70]);
-  const textBlurNum = useTransform(scrollYProgress, [0, 0.3], [0, 9]);
+  /* Cinematic, compositor-only motion (cheap, runs every frame) */
+  const videoScale = useTransform(smoothProgress, [0, 1], [1.12, 1]);
+  const videoY = useTransform(smoothProgress, [0, 1], ["-2%", "2%"]);
+  const textOpacity = useTransform(smoothProgress, [0, 0.16, 0.3], [1, 1, 0]);
+  const textY = useTransform(smoothProgress, [0, 0.3], [0, -80]);
+  const textBlurNum = useTransform(smoothProgress, [0, 0.3], [0, 10]);
   const textFilter = useTransform(textBlurNum, (b) => `blur(${b}px)`);
-  const overlayOpacity = useTransform(scrollYProgress, [0, 1], [0.5, 0.82]);
-  const cueOpacity = useTransform(scrollYProgress, [0, 0.08], [1, 0]);
+  const overlayOpacity = useTransform(smoothProgress, [0, 1], [0.5, 0.85]);
+  const cueOpacity = useTransform(smoothProgress, [0, 0.08], [1, 0]);
 
-  /* Scroll-linked scrubbing loop */
+  /* 2+3) Gated, grid-snapped scrubbing loop */
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
     let rafId = 0;
-    const FRAME_EPSILON = 1 / 60; // skip seeks smaller than a single frame
+    let seeking = false;
+    let seekStartedAt = 0;
+    let duration = 0;
+    const SNAP = 1 / 24; // match source fps — cheap now the video is all-keyframe
+    const SEEK_TIMEOUT = 220; // ms; recover if a `seeked` never fires
 
     const onMeta = () => {
-      durationRef.current = video.duration || 0;
+      duration = video.duration || 0;
+    };
+    const onSeeked = () => {
+      seeking = false;
     };
     video.addEventListener("loadedmetadata", onMeta);
+    video.addEventListener("seeked", onSeeked);
     if (video.readyState >= 1) onMeta();
 
-    // Prime the decoder (iOS/Safari needs a play()/pause() to allow seeking)
+    // Prime the decoder (iOS/Safari needs play()/pause() to allow seeking)
     const p = video.play();
     if (p && typeof p.then === "function") {
       p.then(() => video.pause()).catch(() => {});
     }
 
-    const tick = () => {
-      const d = durationRef.current;
-      if (d > 0) {
-        const target = progress.current * d;
-        // Critically-damped lerp toward target for smooth scrubbing
-        rendered.current += (target - rendered.current) * 0.12;
-        if (Math.abs(video.currentTime - rendered.current) > FRAME_EPSILON) {
-          try {
-            video.currentTime = rendered.current;
-          } catch {
-            /* ignore transient seek errors during buffering */
+    const tick = (now: number) => {
+      if (duration > 0) {
+        // Release a stuck seek (target already buffered / no event fired)
+        if (seeking && now - seekStartedAt > SEEK_TIMEOUT) seeking = false;
+
+        if (!seeking) {
+          const target = progress.current * duration;
+          const snapped = Math.round(target / SNAP) * SNAP;
+          if (Math.abs(video.currentTime - snapped) > SNAP * 0.5) {
+            seeking = true;
+            seekStartedAt = now;
+            try {
+              video.currentTime = snapped;
+            } catch {
+              seeking = false;
+            }
           }
         }
       }
@@ -86,21 +112,24 @@ export default function HeroVideoScrub() {
     return () => {
       cancelAnimationFrame(rafId);
       video.removeEventListener("loadedmetadata", onMeta);
+      video.removeEventListener("seeked", onSeeked);
     };
   }, [videoOk]);
 
   return (
     <section ref={sectionRef} className="relative h-[320vh]">
       {/* Pinned stage */}
-      <div className="sticky top-0 h-screen w-full overflow-hidden bg-obsidian">
-        {/* Video / graceful fallback */}
-        <div className="absolute inset-0 will-change-transform [transform:translateZ(0)]">
+      <div className="grain sticky top-0 h-screen w-full overflow-hidden bg-obsidian">
+        {/* Video / graceful fallback — parallax scale runs on the compositor */}
+        <motion.div
+          style={{ scale: videoScale, y: videoY }}
+          className="absolute inset-0 will-change-transform [transform:translateZ(0)]"
+        >
           {videoOk ? (
             <video
               ref={videoRef}
               className="h-full w-full object-cover"
               src="/hero-video.mp4"
-              poster="/hero-poster.jpg"
               muted
               playsInline
               preload="auto"
@@ -109,7 +138,7 @@ export default function HeroVideoScrub() {
           ) : (
             <FallbackBackdrop />
           )}
-        </div>
+        </motion.div>
 
         {/* Cinematic gradients */}
         <motion.div
@@ -137,21 +166,48 @@ export default function HeroVideoScrub() {
           </motion.span>
 
           <motion.h1
-            initial={{ opacity: 0, y: 44, filter: "blur(12px)" }}
-            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            transition={{ duration: 1.3, ease: EASE, delay: 0.35 }}
+            initial="hidden"
+            animate="visible"
+            variants={{
+              hidden: {},
+              visible: { transition: { staggerChildren: 0.12, delayChildren: 0.3 } },
+            }}
             className="text-5xl leading-[1.08] text-ink sm:text-7xl lg:text-[5.5rem]"
           >
-            הדר אלימלך
-            <span className="mt-5 block text-gradient-gold text-3xl font-light sm:text-5xl lg:text-6xl">
+            <motion.span
+              variants={{
+                hidden: { opacity: 0, y: 44, filter: "blur(12px)" },
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  filter: "blur(0px)",
+                  transition: { duration: 1.2, ease: EASE },
+                },
+              }}
+              className="block"
+            >
+              הדר אלימלך
+            </motion.span>
+            <motion.span
+              variants={{
+                hidden: { opacity: 0, y: 44, filter: "blur(12px)" },
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  filter: "blur(0px)",
+                  transition: { duration: 1.2, ease: EASE },
+                },
+              }}
+              className="mt-5 block text-gradient-gold text-3xl font-light sm:text-5xl lg:text-6xl"
+            >
               מנהיגות משפטית בחדלות פירעון
-            </span>
+            </motion.span>
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.1, ease: EASE, delay: 0.7 }}
+            transition={{ duration: 1.1, ease: EASE, delay: 0.8 }}
             className="balance mt-8 max-w-xl text-base font-light leading-relaxed text-muted sm:text-lg"
           >
             ייצוג משפטי ברמה הגבוהה ביותר — הופכים משבר כלכלי להזדמנות
