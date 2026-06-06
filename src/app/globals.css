@@ -1,26 +1,122 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
+/* ============================================================
+   HADAR ELIMELECH — Luxury Insolvency Law
+   Design tokens (Tailwind v4 CSS-first config)
+   ============================================================ */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Palette — Deep Luxury Dark */
+  --color-obsidian: #050505;
+  --color-charcoal: #0d0d0e;
+  --color-panel: #14110b;
+  --color-line: #211d14;
+
+  --color-gold: #d4af37;
+  --color-gold-soft: #e7d292;
+  --color-bronze: #8a6a35;
+
+  --color-ink: #ededed;
+  --color-muted: #a39e95;
+
+  /* Typography */
+  --font-sans: var(--font-heebo);
+  --font-serif: var(--font-frank);
+  --font-display: var(--font-cormorant);
+
+  /* Motion */
+  --ease-lux: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  --background: var(--color-obsidian);
+  --foreground: var(--color-ink);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    background-color: var(--color-obsidian);
+  }
+
+  body {
+    background-color: var(--color-obsidian);
+    color: var(--color-ink);
+    font-family: var(--font-sans), system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-serif), Georgia, serif;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  ::selection {
+    background-color: var(--color-gold);
+    color: var(--color-obsidian);
+  }
+
+  /* Refined dark scrollbar */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--color-obsidian);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-bronze);
+    border-radius: 9999px;
+    border: 2px solid var(--color-obsidian);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-gold);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer utilities {
+  /* Gold gradient text */
+  .text-gradient-gold {
+    background-image: linear-gradient(
+      105deg,
+      var(--color-bronze) 0%,
+      var(--color-gold) 45%,
+      var(--color-gold-soft) 70%,
+      var(--color-gold) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Hairline gold divider */
+  .rule-gold {
+    background-image: linear-gradient(
+      to left,
+      transparent,
+      var(--color-gold),
+      transparent
+    );
+  }
+
+  /* Subtle film grain for the luxury "paper" feel */
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .balance {
+    text-wrap: balance;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
