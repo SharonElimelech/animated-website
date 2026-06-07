@@ -3,13 +3,13 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Search } from "lucide-react";
 
 const LINKS = [
-  { label: "מחשבון חובות", href: "#calculator" },
+  { label: "בית", href: "#home" },
   { label: "אודות", href: "#about" },
-  { label: "המסלול שלך", href: "#process" },
-  { label: "שאלות נפוצות", href: "#faq" },
+  { label: "מחשבון חובות", href: "#calculator" },
+  { label: "המסלול", href: "#process" },
   { label: "צור קשר", href: "#contact" },
 ];
 
@@ -31,48 +31,51 @@ export default function Navbar() {
       transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
       className="fixed inset-x-0 top-5 z-50 px-4"
     >
-      {/* Floating Crystal-Clear glass bar — near-transparent, soft 5px blur,
-          silver rim light. Opacity lifts slightly on scroll for legibility. */}
       <nav
-        className={`mx-auto flex max-w-5xl items-center justify-between gap-6 rounded-full border border-white/10 px-6 py-3 shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] backdrop-blur-sm transition-all duration-500 lg:px-8 ${
-          scrolled ? "bg-black/30" : "bg-white/[0.02]"
+        className={`relative mx-auto flex max-w-6xl items-center justify-between gap-6 rounded-full border border-white/10 px-6 py-3 backdrop-blur-sm transition-all duration-500 lg:px-8 ${
+          scrolled ? "bg-black/40" : "bg-white/[0.03]"
         }`}
       >
-        {/* Brand — logo on the right (RTL); screen blend drops the dark panel */}
-        <a href="#" aria-label="הדר אלימלך — דף הבית" className="group flex items-center">
+        {/* Brand — right (RTL start) */}
+        <a href="#home" aria-label="הדר אלימלך — דף הבית" className="group flex items-center">
           <Image
             src="/logo-float.png"
             alt="הדר אלימלך — משרד עורכי דין"
             width={331}
             height={251}
             priority
-            className="h-12 w-auto object-contain transition-transform duration-500 group-hover:scale-[1.03] sm:h-14"
+            className="h-11 w-auto object-contain transition-transform duration-500 group-hover:scale-[1.03] sm:h-12"
           />
         </a>
 
-        {/* Left group: links + CTA */}
-        <div className="hidden items-center gap-8 md:flex lg:gap-10">
-          <ul className="flex items-center gap-8 lg:gap-9">
-            {LINKS.map((l) => (
-              <li key={l.href}>
-                <a
-                  href={l.href}
-                  className="group relative text-shadow-lux text-sm font-light tracking-wide text-ink/80 transition-colors hover:text-ink"
-                >
-                  {l.label}
-                  <span className="absolute -bottom-1.5 right-0 h-px w-0 bg-gold transition-all duration-300 group-hover:w-full" />
-                </a>
-              </li>
-            ))}
-          </ul>
+        {/* Centered links */}
+        <ul className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-9 md:flex">
+          {LINKS.map((l) => (
+            <li key={l.href}>
+              <a
+                href={l.href}
+                className="group relative text-shadow-lux text-sm font-light tracking-wide text-ink/80 transition-colors hover:text-ink"
+              >
+                {l.label}
+                <span className="absolute -bottom-1.5 right-0 h-px w-0 bg-gold transition-all duration-300 group-hover:w-full" />
+              </a>
+            </li>
+          ))}
+        </ul>
 
-          {/* CTA — gold border + glow */}
-          <a
-            href="#contact"
-            className="rounded-full border border-gold px-6 py-2 text-sm font-medium tracking-wide text-gold shadow-[0_0_20px_-2px_rgba(212,175,55,0.45)] transition-all duration-300 hover:bg-gold hover:text-obsidian hover:shadow-[0_0_28px_0_rgba(212,175,55,0.6)]"
+        {/* Left: search + language switcher */}
+        <div className="hidden items-center gap-5 md:flex">
+          <button
+            aria-label="חיפוש"
+            className="text-ink/70 transition-colors hover:text-gold"
           >
-            ייעוץ משפטי
-          </a>
+            <Search className="h-5 w-5" strokeWidth={1.6} />
+          </button>
+          <span className="text-shadow-lux text-sm font-light tracking-wide text-ink/70">
+            <span className="text-gold">עב</span>
+            <span className="mx-1.5 text-white/30">|</span>
+            <span className="cursor-pointer transition-colors hover:text-ink">EN</span>
+          </span>
         </div>
 
         {/* Mobile toggle */}
@@ -90,7 +93,7 @@ export default function Navbar() {
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="glass-dark mx-auto mt-3 max-w-5xl overflow-hidden rounded-3xl md:hidden"
+          className="mx-auto mt-3 max-w-6xl overflow-hidden rounded-3xl border border-white/10 bg-black/70 backdrop-blur-xl md:hidden"
         >
           <ul className="flex flex-col gap-1 px-6 py-4">
             {LINKS.map((l) => (
@@ -104,15 +107,6 @@ export default function Navbar() {
                 </a>
               </li>
             ))}
-            <li>
-              <a
-                href="#contact"
-                onClick={() => setOpen(false)}
-                className="mt-2 block rounded-full border border-gold py-3 text-center font-medium text-gold shadow-[0_0_20px_-2px_rgba(212,175,55,0.45)]"
-              >
-                ייעוץ משפטי
-              </a>
-            </li>
           </ul>
         </motion.div>
       )}
