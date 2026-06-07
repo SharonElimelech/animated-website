@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 
 const LINKS = [
+  { label: "מחשבון חובות", href: "#calculator" },
   { label: "אודות", href: "#about" },
   { label: "המסלול שלך", href: "#process" },
   { label: "שאלות נפוצות", href: "#faq" },

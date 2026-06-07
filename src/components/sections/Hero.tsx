@@ -25,10 +25,12 @@ export default function Hero() {
         animate="visible"
         className="w-full max-w-2xl transform-gpu rounded-3xl border border-white/10 bg-black/60 p-8 text-right backdrop-blur-3xl sm:p-10 lg:max-w-3xl"
       >
-        {/* A. Eyebrow tag */}
+        {/* A. Eyebrow tag — metallic gradient border + text */}
         <motion.div variants={item}>
-          <span className="text-shadow-lux inline-block rounded-sm border border-gold/60 px-3 py-1.5 text-[0.7rem] font-light tracking-[0.2em] text-gold/90 sm:text-xs">
-            סביבה משפטית ללא פשרות
+          <span className="gold-edge inline-block rounded-sm px-3 py-1.5">
+            <span className="gold-text text-[0.7rem] font-light tracking-[0.2em] sm:text-xs">
+              סביבה משפטית ללא פשרות
+            </span>
           </span>
         </motion.div>
 
@@ -37,15 +39,15 @@ export default function Hero() {
           variants={item}
           className="text-shadow-lux mt-7 font-heebo text-5xl font-black leading-[0.95] tracking-tight sm:text-7xl lg:text-8xl"
         >
-          <span className="block text-gold">החובות חונקים?</span>
-          <span className="block text-ink">אנחנו כאן</span>
-          <span className="block text-ink">לעצור את זה.</span>
+          <span className="gold-text block">החובות חונקים?</span>
+          <span className="block text-white">אנחנו כאן</span>
+          <span className="block text-white">לעצור את זה.</span>
         </motion.h1>
 
         {/* C. Accented subtitle with vertical gold line */}
         <motion.p
           variants={item}
-          className="text-shadow-lux mr-auto mt-8 max-w-xl border-r-2 border-gold pr-4 text-sm font-light leading-relaxed text-ink/85 sm:text-base"
+          className="text-shadow-lux gold-rule-r mr-auto mt-8 max-w-xl pr-4 text-sm font-light leading-relaxed text-ink/85 sm:text-base"
         >
           משרד עו״ד הדר אלימלך - מומחיות בחדלות פירעון, מחיקת חובות ושיקום
           כלכלי. החזירו את השליטה לחיים שלכם עם אסטרטגיה מנצחת.
@@ -55,7 +57,7 @@ export default function Hero() {
         <motion.div variants={item} className="mt-10 flex flex-wrap items-center gap-4">
           <a
             href="#contact"
-            className="rounded-full bg-gold px-8 py-3.5 text-sm font-bold text-obsidian transition-all duration-300 hover:brightness-110"
+            className="gold-bg rounded-full px-8 py-3.5 text-sm font-bold text-obsidian shadow-[0_0_25px_-4px_rgba(212,175,55,0.55)] transition-all duration-300 hover:brightness-110"
           >
             בדיקת זכאות
           </a>
