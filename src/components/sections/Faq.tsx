@@ -65,7 +65,7 @@ export default function Faq() {
 
       <div className="mt-16 grid gap-10 lg:grid-cols-[1.6fr_1fr]">
         {/* Accordion */}
-        <Reveal amount={0.1} className="flex flex-col gap-4">
+        <Reveal amount={0.1} fade className="flex flex-col gap-4">
           {FAQ.map((item, i) => {
             const isOpen = open === i;
             return (

@@ -1,6 +1,19 @@
 import type { Metadata } from "next";
-import { Frank_Ruhl_Libre, Assistant, Cormorant_Garamond } from "next/font/google";
+import {
+  Frank_Ruhl_Libre,
+  Assistant,
+  Cormorant_Garamond,
+  Heebo,
+} from "next/font/google";
 import "./globals.css";
+
+/* Heavy display sans — massive block-letter hero headline */
+const heebo = Heebo({
+  variable: "--font-heebo",
+  subsets: ["hebrew", "latin"],
+  weight: ["800", "900"],
+  display: "swap",
+});
 
 /* Elegant Hebrew serif — all major headings & logo */
 const frank = Frank_Ruhl_Libre({
@@ -26,17 +39,49 @@ const cormorant = Cormorant_Garamond({
   display: "swap",
 });
 
+const TITLE = "הדר אלימלך - משרד עורכי דין | חדלות פירעון ושיקום כלכלי";
+const DESCRIPTION =
+  "אסטרטגיה אישית וממוקדת תוצאות להחזרת השליטה הפיננסית שלך. מנהיגות משפטית בחדלות פירעון, הסדרי חובות מורכבים ופירוק חברות.";
+const SITE_URL = "https://hadar-elimelech.co.il";
+
 export const metadata: Metadata = {
-  title: "הדר אלימלך | שיקום כלכלי, הסדרי חובות וחדלות פירעון",
-  description:
-    "הדר אלימלך — מנהיגות משפטית לשיקום כלכלי. מעטפת אסטרטגית לניהול משברים פיננסיים, הסדרי חובות, ביטול עיקולים והפטר חלוט.",
-  metadataBase: new URL("https://hadar-elimelech.co.il"),
+  metadataBase: new URL(SITE_URL),
+  title: TITLE,
+  description: DESCRIPTION,
+  applicationName: "הדר אלימלך — משרד עורכי דין",
+  keywords: [
+    "הדר אלימלך",
+    "עורך דין חדלות פירעון",
+    "שיקום כלכלי",
+    "הסדרי חובות",
+    "מחיקת חובות",
+    "ביטול עיקולים",
+    "פירוק והבראת חברות",
+    "הוצאה לפועל",
+    "הפטר",
+  ],
+  alternates: { canonical: "/" },
   openGraph: {
-    title: "הדר אלימלך | מנהיגות משפטית לשיקום כלכלי",
-    description:
-      "מעטפת משפטית אסטרטגית לניהול משברים פיננסיים, מחיקת חובות והסרת הגבלות.",
+    title: TITLE,
+    description: DESCRIPTION,
+    url: SITE_URL,
+    siteName: "הדר אלימלך — משרד עורכי דין",
     locale: "he_IL",
     type: "website",
+    images: [
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        alt: "הדר אלימלך — משרד עורכי דין",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+    images: ["/og.png"],
   },
 };
 
@@ -49,7 +94,7 @@ export default function RootLayout({
     <html
       lang="he"
       dir="rtl"
-      className={`${frank.variable} ${assistant.variable} ${cormorant.variable} h-full antialiased`}
+      className={`${frank.variable} ${assistant.variable} ${cormorant.variable} ${heebo.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-obsidian text-ink">{children}</body>
     </html>

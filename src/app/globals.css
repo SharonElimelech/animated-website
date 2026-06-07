@@ -115,22 +115,25 @@
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
   }
 
-  /* ===== Super-premium glass ===== */
-  .glass {
-    background-color: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(40px) saturate(150%);
-    -webkit-backdrop-filter: blur(40px) saturate(150%);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+  /* Heavy display sans for the hero headline */
+  .font-heebo {
+    font-family: var(--font-heebo), system-ui, sans-serif;
   }
 
-  /* Darker glass for text-heavy containers (forms, accordions) */
+  /* ===== Super-premium glass ===== */
+  /* Solid translucent panels — NO backdrop-filter, so they don't re-blur the
+     moving video every scroll frame. Keeps the dark-glass look via tint + rim
+     light + shadow, but composites cheaply. (Real blur stays on hero + navbar.) */
+  .glass {
+    background-color: rgba(16, 15, 13, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.7);
+  }
+
   .glass-dark {
-    background-color: rgba(0, 0, 0, 0.35);
-    backdrop-filter: blur(40px) saturate(150%);
-    -webkit-backdrop-filter: blur(40px) saturate(150%);
+    background-color: rgba(5, 5, 6, 0.66);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.7);
   }
 
   /* Hairline gold divider */

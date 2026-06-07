@@ -49,10 +49,10 @@ export default function Contact() {
             </p>
           </Reveal>
 
-          <Reveal delay={0.15} amount={0.4} className="mt-10 grid gap-4 sm:grid-cols-2">
+          <Reveal delay={0.15} amount={0.4} fade className="mt-10 grid gap-4 sm:grid-cols-2">
             <a
               href={telLink}
-              className="glass group flex items-center justify-between rounded-xl p-5 transition-all hover:border-gold/40"
+              className="glass group flex items-center justify-between rounded-xl p-5 transition-all duration-500 hover:-translate-y-1 hover:border-gold/40"
             >
               <span className="flex h-11 w-11 items-center justify-center rounded-full bg-gold/10 text-gold transition-colors group-hover:bg-gold group-hover:text-obsidian">
                 <Phone className="h-5 w-5" strokeWidth={1.6} />
@@ -96,7 +96,7 @@ export default function Contact() {
         </div>
 
         {/* Right: form */}
-        <Reveal amount={0.2}>
+        <Reveal amount={0.2} fade>
           <form
             onSubmit={submit}
             className="glass-dark rounded-2xl p-8 lg:p-10"

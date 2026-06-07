@@ -1,113 +1,73 @@
 "use client";
 
 import { motion, type Variants } from "framer-motion";
+import { whatsappLink } from "@/lib/site";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-/* Crystal-clear glass bubble: near-transparent, lightly blurred, sharp.
-   Children slide up in sequence (staggerChildren) and stay visible. */
-const bubble: Variants = {
-  hidden: { opacity: 0, scale: 0.98, y: 24 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    y: 0,
-    transition: {
-      duration: 1,
-      ease: EASE,
-      staggerChildren: 0.15,
-      delayChildren: 0.25,
-    },
-  },
+const container: Variants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.14, delayChildren: 0.2 } },
 };
-
 const item: Variants = {
-  hidden: { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 28 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: EASE } },
 };
 
+/* Right-aligned editorial hero over the looping background video.
+   Staggered on-load entrance; static thereafter (smooth scroll). */
 export default function Hero() {
   return (
-    <section className="relative flex min-h-screen items-center justify-center px-6 py-32">
-      {/* Crystal-clear glass — near-transparent, soft 5px blur, sharp rim + shadow */}
+    <section className="relative flex min-h-screen items-center px-6 py-32 lg:px-16">
       <motion.div
-        variants={bubble}
+        variants={container}
         initial="hidden"
         animate="visible"
-        className="relative w-full max-w-3xl rounded-[2.5rem] border border-white/10 bg-white/[0.01] px-8 py-16 text-center shadow-[0_8px_32px_0_rgba(0,0,0,0.8)] backdrop-blur-sm sm:px-16 sm:py-20"
+        className="w-full max-w-2xl transform-gpu rounded-3xl border border-white/10 bg-black/60 p-8 text-right backdrop-blur-3xl sm:p-10 lg:max-w-3xl"
       >
-        {/* Eyebrow */}
-        <motion.p
-          variants={item}
-          className="text-shadow-lux mb-7 text-xs font-light tracking-[0.45em] text-gold/90 sm:text-sm"
-        >
-          שיקום כלכלי · הסדרי חובות · חדלות פירעון
-        </motion.p>
+        {/* A. Eyebrow tag */}
+        <motion.div variants={item}>
+          <span className="text-shadow-lux inline-block rounded-sm border border-gold/60 px-3 py-1.5 text-[0.7rem] font-light tracking-[0.2em] text-gold/90 sm:text-xs">
+            סביבה משפטית ללא פשרות
+          </span>
+        </motion.div>
 
-        {/* Main title — Frank Ruhl serif */}
+        {/* B. Dual-color massive headline (Heebo Black) */}
         <motion.h1
           variants={item}
-          className="font-serif text-5xl font-semibold leading-[1.05] tracking-[0.01em] text-platinum sm:text-7xl lg:text-8xl"
+          className="text-shadow-lux mt-7 font-heebo text-5xl font-black leading-[0.95] tracking-tight sm:text-7xl lg:text-8xl"
         >
-          הדר אלימלך
-          <span className="mt-4 block text-gradient-gold text-2xl font-medium tracking-normal sm:text-4xl lg:text-5xl">
-            מנהיגות משפטית לשיקום כלכלי
-          </span>
+          <span className="block text-gold">החובות חונקים?</span>
+          <span className="block text-ink">אנחנו כאן</span>
+          <span className="block text-ink">לעצור את זה.</span>
         </motion.h1>
 
-        {/* Expanded, confident subtitle (Assistant) */}
+        {/* C. Accented subtitle with vertical gold line */}
         <motion.p
           variants={item}
-          className="text-shadow-lux mx-auto mt-9 max-w-2xl font-sans text-lg font-medium leading-snug text-ink/95 sm:text-2xl"
+          className="text-shadow-lux mr-auto mt-8 max-w-xl border-r-2 border-gold pr-4 text-sm font-light leading-relaxed text-ink/85 sm:text-base"
         >
-          אסטרטגיה אישית וממוקדת תוצאות להחזרת השליטה הפיננסית שלך.
+          משרד עו״ד הדר אלימלך - מומחיות בחדלות פירעון, מחיקת חובות ושיקום
+          כלכלי. החזירו את השליטה לחיים שלכם עם אסטרטגיה מנצחת.
         </motion.p>
 
-        {/* New editorial body paragraph (Assistant) */}
-        <motion.p
-          variants={item}
-          className="text-shadow-lux mx-auto mt-6 max-w-2xl font-sans text-sm font-light leading-8 text-ink/70 sm:text-base sm:leading-9"
-        >
-          אנו מספקים מעטפת משפטית דיסקרטית לניהול משברים פיננסיים, מחיקת חובות,
-          הסדרי בנקים מורכבים ופירוק חברות. הגישה האסטרטגית שלנו הופכת משבר קיומי
-          להזדמנות מוכחת להתחלה חדשה, ללא פשרות.
-        </motion.p>
-
-        {/* Two-button group */}
-        <motion.div
-          variants={item}
-          className="mt-11 flex items-center justify-center gap-4"
-        >
-          <a
-            href="#about"
-            className="rounded-full border border-white/15 bg-white/10 px-8 py-3.5 text-sm font-medium text-ink backdrop-blur-md transition-all duration-300 hover:bg-white/20"
-          >
-            אודות
-          </a>
+        {/* D. Button group */}
+        <motion.div variants={item} className="mt-10 flex flex-wrap items-center gap-4">
           <a
             href="#contact"
-            className="rounded-full border border-white/10 bg-black/80 px-8 py-3.5 text-sm font-medium text-ink shadow-lg transition-all duration-300 hover:bg-black"
+            className="rounded-full bg-gold px-8 py-3.5 text-sm font-bold text-obsidian transition-all duration-300 hover:brightness-110"
           >
-            קביעת פגישה
+            בדיקת זכאות
+          </a>
+          <a
+            href={whatsappLink("היי, זו פנייה דחופה — אשמח לתיאום שיחת חירום")}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-full border border-white/80 px-8 py-3.5 text-sm font-medium text-ink transition-all duration-300 hover:bg-white hover:text-obsidian"
+          >
+            תיאום שיחת חירום
           </a>
         </motion.div>
-      </motion.div>
-
-      {/* Scroll cue */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 1.4 }}
-        className="absolute inset-x-0 bottom-10 flex flex-col items-center gap-3 text-muted"
-      >
-        <span className="text-shadow-lux text-[0.7rem] tracking-[0.35em]">גלילה</span>
-        <span className="relative flex h-12 w-px overflow-hidden bg-line/60">
-          <motion.span
-            animate={{ y: ["-100%", "120%"] }}
-            transition={{ duration: 1.8, ease: "easeInOut", repeat: Infinity }}
-            className="absolute inset-x-0 h-1/2 bg-gold"
-          />
-        </span>
       </motion.div>
     </section>
   );

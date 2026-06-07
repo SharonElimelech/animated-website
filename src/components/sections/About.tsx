@@ -1,5 +1,6 @@
 import { Reveal, StaggerGroup, StaggerItem } from "@/components/ui/Reveal";
 import Portrait from "@/components/ui/Portrait";
+import Parallax from "@/components/ui/Parallax";
 import { SITE } from "@/lib/site";
 import { Handshake, Gavel, RefreshCw, Building2, Award } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -86,21 +87,23 @@ export default function About() {
 
         {/* Portrait column */}
         <Reveal amount={0.3} className="relative">
-          <div className="relative aspect-[4/5] overflow-hidden rounded-3xl border border-line">
-            <Portrait
-              src="/hadar-portrait.jpg"
-              alt="הדר אלימלך"
-              className="absolute inset-0 h-full w-full object-cover"
-            />
-            {/* Bottom fade + name overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-obsidian via-obsidian/10 to-transparent" />
-            <div className="absolute bottom-0 right-0 p-8 text-right">
-              <p className="font-serif text-2xl font-bold tracking-[0.04em] text-ink">{SITE.name}</p>
-              <p className="mt-1 text-xs tracking-[0.3em] text-gold/85">
-                {SITE.tagline}
-              </p>
+          <Parallax distance={28}>
+            <div className="group/portrait relative aspect-[4/5] overflow-hidden rounded-3xl border border-line">
+              <Portrait
+                src="/hadar-portrait.jpg"
+                alt="הדר אלימלך"
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1.2s] ease-out group-hover/portrait:scale-105"
+              />
+              {/* Bottom fade + name overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-obsidian via-obsidian/10 to-transparent" />
+              <div className="absolute bottom-0 right-0 p-8 text-right">
+                <p className="font-serif text-2xl font-bold tracking-[0.04em] text-ink">{SITE.name}</p>
+                <p className="mt-1 text-xs tracking-[0.3em] text-gold/85">
+                  {SITE.tagline}
+                </p>
+              </div>
             </div>
-          </div>
+          </Parallax>
 
           {/* Boutique badge */}
           <div className="absolute -bottom-8 left-6 flex h-32 w-32 flex-col items-center justify-center gap-2 rounded-full border border-gold/40 bg-obsidian/90 text-center backdrop-blur-sm lg:-left-8">
@@ -120,7 +123,7 @@ export default function About() {
 function ServiceCard({ service }: { service: Service }) {
   const Icon = service.icon;
   return (
-    <article className="glass group relative h-full overflow-hidden rounded-2xl p-7 transition-all duration-500 hover:border-gold/40">
+    <article className="glass group relative h-full overflow-hidden rounded-2xl p-7 transition-all duration-500 hover:-translate-y-1.5 hover:border-gold/40 hover:shadow-[0_18px_40px_-12px_rgba(0,0,0,0.7)]">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(212,175,55,0.1),transparent_65%)] opacity-0 transition-opacity duration-700 group-hover:opacity-100" />
       <Icon
         className="relative h-7 w-7 text-gold transition-transform duration-500 group-hover:-translate-y-1"

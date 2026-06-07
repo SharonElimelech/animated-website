@@ -1,29 +1,30 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import {
-  motion,
-  useScroll,
-  useSpring,
-  useTransform,
-  useMotionValueEvent,
-} from "framer-motion";
+import { motion, useScroll, useSpring, useMotionValueEvent } from "framer-motion";
 
 /**
- * Persistent fixed background video for the whole page.
- * Its currentTime scrubs across the ENTIRE page scroll, so it travels from
- * fragmented (top) to solid/locked (bottom) as the user reads through the
- * sections that flow over it. A scroll-darkening scrim keeps Hebrew text sharp.
+ * Apple-style canvas-video scrubbing — scroll-tied, smooth, bright, sharp.
+ *
+ *  - A hidden <video> (all-keyframe, so seeks are instant) is seeked by scroll
+ *    progress; each decoded frame is painted to a full-screen <canvas>.
+ *  - High-DPI: backing store = CSS size × devicePixelRatio + ctx.scale(dpr) so
+ *    frames render crisply at native screen density (no softness).
+ *  - NO dimming overlay — the background stays fully bright. Text legibility is
+ *    handled by the deep glass bubble in the Hero.
+ *  - Zero React state on scroll: progress lives in a ref (useMotionValueEvent);
+ *    an rAF loop draws imperatively. Seeks gated on `seeked` + frame-snapped.
  */
 export default function ScrubBackground() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const progress = useRef(0);
-  const [videoOk, setVideoOk] = useState(true);
+  const [fallback, setFallback] = useState(false);
 
-  const { scrollYProgress } = useScroll(); // whole document
+  const { scrollYProgress } = useScroll();
   const smooth = useSpring(scrollYProgress, {
-    stiffness: 100,
-    damping: 30,
+    stiffness: 90,
+    damping: 28,
     mass: 0.4,
     restDelta: 0.0001,
   });
@@ -31,42 +32,91 @@ export default function ScrubBackground() {
     progress.current = v;
   });
 
-  // Scrim strengthens as we descend → lower sections read calm and solid.
-  const scrimOpacity = useTransform(smooth, [0, 0.5, 1], [0.5, 0.64, 0.8]);
-
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) return;
+    const canvas = canvasRef.current;
+    if (!video || !canvas) return;
+    const ctx = canvas.getContext("2d", { alpha: false });
+    if (!ctx) return;
 
     let rafId = 0;
+    let rvfcId = 0;
     let seeking = false;
     let seekStartedAt = 0;
     let duration = 0;
-    const SNAP = 1 / 24;
-    const SEEK_TIMEOUT = 220;
+    let ready = false;
+    const FRAME = 1 / 24;
+    const SEEK_TIMEOUT = 240;
+    const hasRVFC = "requestVideoFrameCallback" in video;
 
+    // object-fit: cover, drawn in CSS pixels (ctx pre-scaled by DPR)
+    const draw = () => {
+      const vw = video.videoWidth;
+      const vh = video.videoHeight;
+      if (!vw || !vh) return;
+      const cssW = window.innerWidth;
+      const cssH = window.innerHeight;
+      const scale = Math.max(cssW / vw, cssH / vh);
+      const dw = vw * scale;
+      const dh = vh * scale;
+      ctx.clearRect(0, 0, cssW, cssH);
+      ctx.drawImage(video, (cssW - dw) / 2, (cssH - dh) / 2, dw, dh);
+    };
+
+    // High-DPI setup: CSS size standard, backing store = css × DPR
+    const setup = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const cssW = window.innerWidth;
+      const cssH = window.innerHeight;
+      canvas.style.width = `${cssW}px`;
+      canvas.style.height = `${cssH}px`;
+      canvas.width = Math.round(cssW * dpr);
+      canvas.height = Math.round(cssH * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+      draw();
+    };
+
+    const onFrame = () => {
+      draw();
+      if (hasRVFC) rvfcId = video.requestVideoFrameCallback(onFrame);
+    };
     const onMeta = () => {
       duration = video.duration || 0;
     };
     const onSeeked = () => {
       seeking = false;
+      if (!hasRVFC) draw();
     };
+    const onReady = () => {
+      if (ready) return;
+      ready = true;
+      setup();
+      if (hasRVFC) rvfcId = video.requestVideoFrameCallback(onFrame);
+    };
+
     video.addEventListener("loadedmetadata", onMeta);
     video.addEventListener("seeked", onSeeked);
+    video.addEventListener("loadeddata", onReady);
+    video.addEventListener("canplay", onReady);
+    video.addEventListener("error", () => setFallback(true));
     if (video.readyState >= 1) onMeta();
+    if (video.readyState >= 2) onReady();
 
+    // Prime the decoder (Safari/iOS needs play()/pause() to allow seeking)
     const p = video.play();
     if (p && typeof p.then === "function") {
       p.then(() => video.pause()).catch(() => {});
     }
 
     const tick = (now: number) => {
-      if (duration > 0) {
+      if (ready && duration > 0) {
         if (seeking && now - seekStartedAt > SEEK_TIMEOUT) seeking = false;
         if (!seeking) {
           const target = progress.current * duration;
-          const snapped = Math.round(target / SNAP) * SNAP;
-          if (Math.abs(video.currentTime - snapped) > SNAP * 0.5) {
+          const snapped = Math.round(target / FRAME) * FRAME;
+          if (Math.abs(video.currentTime - snapped) > FRAME / 2) {
             seeking = true;
             seekStartedAt = now;
             try {
@@ -80,39 +130,37 @@ export default function ScrubBackground() {
       rafId = requestAnimationFrame(tick);
     };
     rafId = requestAnimationFrame(tick);
+    window.addEventListener("resize", setup);
 
     return () => {
       cancelAnimationFrame(rafId);
+      if (hasRVFC && rvfcId) video.cancelVideoFrameCallback?.(rvfcId);
+      window.removeEventListener("resize", setup);
       video.removeEventListener("loadedmetadata", onMeta);
       video.removeEventListener("seeked", onSeeked);
+      video.removeEventListener("loadeddata", onReady);
+      video.removeEventListener("canplay", onReady);
     };
-  }, [videoOk]);
+  }, []);
 
   return (
     <div className="fixed inset-0 z-0 h-screen w-full overflow-hidden bg-obsidian">
-      {videoOk ? (
-        <video
-          ref={videoRef}
-          className="h-full w-full object-cover [transform:translateZ(0)] will-change-transform"
-          src="/hero-video.mp4"
-          muted
-          playsInline
-          preload="auto"
-          onError={() => setVideoOk(false)}
-        />
+      {!fallback ? (
+        <canvas ref={canvasRef} className="block h-full w-full" />
       ) : (
         <FallbackBackdrop />
       )}
 
-      {/* Legibility scrim — darkens as you scroll */}
-      <motion.div
+      {/* Hidden source video — decoded for canvas, never composited */}
+      <video
+        ref={videoRef}
+        src="/hero-video.mp4"
+        muted
+        playsInline
+        preload="auto"
         aria-hidden
-        style={{ opacity: scrimOpacity }}
-        className="absolute inset-0 bg-gradient-to-b from-obsidian/60 via-obsidian/30 to-obsidian/75"
-      />
-      <div
-        aria-hidden
-        className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_30%,var(--color-obsidian)_96%)]"
+        tabIndex={-1}
+        style={{ display: "none" }}
       />
     </div>
   );

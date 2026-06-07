@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { motion } from "framer-motion";
-import { Menu, X, Scale } from "lucide-react";
+import { Menu, X } from "lucide-react";
 
 const LINKS = [
   { label: "אודות", href: "#about" },
@@ -29,23 +30,23 @@ export default function Navbar() {
       transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
       className="fixed inset-x-0 top-5 z-50 px-4"
     >
-      {/* Floating glass bar — centered & narrower than full width */}
+      {/* Floating Crystal-Clear glass bar — near-transparent, soft 5px blur,
+          silver rim light. Opacity lifts slightly on scroll for legibility. */}
       <nav
-        className={`mx-auto flex max-w-5xl items-center justify-between gap-6 rounded-full px-6 py-3 transition-all duration-500 lg:px-8 ${
-          scrolled
-            ? "glass-dark"
-            : "glass"
+        className={`mx-auto flex max-w-5xl items-center justify-between gap-6 rounded-full border border-white/10 px-6 py-3 shadow-[0_8px_32px_0_rgba(0,0,0,0.5)] backdrop-blur-sm transition-all duration-500 lg:px-8 ${
+          scrolled ? "bg-black/30" : "bg-white/[0.02]"
         }`}
       >
-        {/* Brand — on the right (RTL), larger */}
-        <a href="#" className="group flex items-center gap-2.5">
-          <Scale
-            className="h-6 w-6 text-gold transition-transform duration-500 group-hover:rotate-6"
-            strokeWidth={1.4}
+        {/* Brand — logo on the right (RTL); screen blend drops the dark panel */}
+        <a href="#" aria-label="הדר אלימלך — דף הבית" className="group flex items-center">
+          <Image
+            src="/logo-float.png"
+            alt="הדר אלימלך — משרד עורכי דין"
+            width={331}
+            height={251}
+            priority
+            className="h-12 w-auto object-contain transition-transform duration-500 group-hover:scale-[1.03] sm:h-14"
           />
-          <span className="font-serif text-xl tracking-[0.05em] text-ink sm:text-2xl">
-            הדר אלימלך
-          </span>
         </a>
 
         {/* Left group: links + CTA */}
@@ -55,7 +56,7 @@ export default function Navbar() {
               <li key={l.href}>
                 <a
                   href={l.href}
-                  className="group relative text-sm font-light tracking-wide text-ink/80 transition-colors hover:text-ink"
+                  className="group relative text-shadow-lux text-sm font-light tracking-wide text-ink/80 transition-colors hover:text-ink"
                 >
                   {l.label}
                   <span className="absolute -bottom-1.5 right-0 h-px w-0 bg-gold transition-all duration-300 group-hover:w-full" />

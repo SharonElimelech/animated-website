@@ -1,4 +1,4 @@
-import { Reveal, StaggerGroup, StaggerItem } from "@/components/ui/Reveal";
+import { Reveal, StaggerGroup, StaggerItem, GrowLine } from "@/components/ui/Reveal";
 
 type Step = { num: string; title: string; description: string };
 
@@ -50,13 +50,13 @@ export default function Process() {
       </Reveal>
 
       <StaggerGroup className="relative mt-24 grid gap-y-16 md:grid-cols-4 md:gap-x-8">
-        {/* Connecting line (desktop) */}
-        <div className="absolute right-[12.5%] left-[12.5%] top-8 hidden h-px bg-line md:block" />
+        {/* Connecting line draws in (RTL: right → left) */}
+        <GrowLine className="absolute right-[12.5%] left-[12.5%] top-8 hidden h-px rule-gold opacity-60 md:block" />
 
         {STEPS.map((step) => (
-          <StaggerItem key={step.num} className="relative">
+          <StaggerItem key={step.num} className="group relative">
             <div className="flex flex-col items-center">
-              <span className="glass-dark relative z-10 flex h-16 w-16 items-center justify-center rounded-full !border-gold/40 font-serif text-xl text-gold">
+              <span className="glass-dark relative z-10 flex h-16 w-16 items-center justify-center rounded-full !border-gold/40 font-serif text-xl text-gold transition-all duration-500 group-hover:scale-110 group-hover:!border-gold group-hover:shadow-[0_0_28px_-4px_rgba(212,175,55,0.55)]">
                 {step.num}
               </span>
               <h3 className="mt-7 text-xl font-bold text-ink">{step.title}</h3>

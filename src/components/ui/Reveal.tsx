@@ -3,17 +3,22 @@
 import { motion, type Variants } from "framer-motion";
 import type { ReactNode } from "react";
 
-// Premium easeOut — smooth, no overshoot, crisp over a moving video.
+// Premium easeOut — smooth, no overshoot.
 const EASE = [0.22, 1, 0.36, 1] as const;
+// Fire just before the element reaches the bottom; never re-run (perf).
+const MARGIN = "0px 0px -100px 0px";
 
-/* Elegant entrance: gently slides up and fades in, then STAYS in place. */
+/* Apple-style entrance: slides up + fades in as it scrolls into view, then stays.
+   Only opacity + transform animate (GPU-friendly). */
 const riseVariants: Variants = {
-  hidden: { opacity: 0, y: 50 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.85, ease: EASE },
-  },
+  hidden: { opacity: 0, y: 28 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: EASE } },
+};
+
+/* Opacity-only variant (lighter; use where preferred). */
+const fadeVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 0.7, ease: EASE } },
 };
 
 type RevealProps = {
@@ -21,6 +26,7 @@ type RevealProps = {
   className?: string;
   delay?: number;
   amount?: number;
+  fade?: boolean;
   as?: "div" | "section" | "article" | "li";
 };
 
@@ -28,18 +34,19 @@ export function Reveal({
   children,
   className,
   delay = 0,
-  amount = 0.25,
+  amount = 0.2,
+  fade = false,
   as = "div",
 }: RevealProps) {
   const MotionTag = motion[as];
   return (
     <MotionTag
-      className={className}
-      variants={riseVariants}
+      className={`transform-gpu ${className ?? ""}`}
+      variants={fade ? fadeVariants : riseVariants}
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, amount }}
-      transition={{ delay, duration: 0.85, ease: EASE }}
+      viewport={{ once: true, amount, margin: MARGIN }}
+      transition={{ delay, duration: 0.7, ease: EASE }}
     >
       {children}
     </MotionTag>
@@ -50,18 +57,12 @@ export function Reveal({
 
 const groupVariants: Variants = {
   hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.13, delayChildren: 0.1 },
-  },
+  visible: { transition: { staggerChildren: 0.12, delayChildren: 0.08 } },
 };
 
 const itemVariants: Variants = {
-  hidden: { opacity: 0, y: 40 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.7, ease: EASE },
-  },
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: EASE } },
 };
 
 export function StaggerGroup({
@@ -75,11 +76,11 @@ export function StaggerGroup({
 }) {
   return (
     <motion.div
-      className={className}
+      className={`transform-gpu ${className ?? ""}`}
       variants={groupVariants}
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, amount }}
+      viewport={{ once: true, amount, margin: MARGIN }}
     >
       {children}
     </motion.div>
@@ -94,8 +95,22 @@ export function StaggerItem({
   className?: string;
 }) {
   return (
-    <motion.div className={className} variants={itemVariants}>
+    <motion.div className={`transform-gpu ${className ?? ""}`} variants={itemVariants}>
       {children}
     </motion.div>
+  );
+}
+
+/** Hairline that draws in (RTL: right→left) when scrolled into view. */
+export function GrowLine({ className }: { className?: string }) {
+  return (
+    <motion.div
+      aria-hidden
+      initial={{ scaleX: 0 }}
+      whileInView={{ scaleX: 1 }}
+      viewport={{ once: true, margin: MARGIN }}
+      transition={{ duration: 1.1, ease: EASE }}
+      className={`origin-right transform-gpu ${className ?? ""}`}
+    />
   );
 }

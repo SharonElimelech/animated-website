@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
 import { Play } from "lucide-react";
 import { Reveal } from "@/components/ui/Reveal";
 import { whatsappLink } from "@/lib/site";
@@ -29,8 +28,8 @@ export default function VideoFeature() {
         </h2>
       </Reveal>
 
-      <Reveal delay={0.1} amount={0.4}>
-        <div className="group relative mt-14 aspect-video overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] backdrop-blur-xl backdrop-saturate-150 shadow-[0_8px_32px_0_rgba(0,0,0,0.8),0_0_90px_-20px_rgba(212,175,55,0.4)]">
+      <Reveal delay={0.1} amount={0.4} fade>
+        <div className="group relative mt-14 aspect-video overflow-hidden rounded-2xl border border-white/10 bg-obsidian/60 shadow-[0_8px_32px_0_rgba(0,0,0,0.8),0_0_90px_-20px_rgba(212,175,55,0.4)]">
           {playing && YOUTUBE_ID ? (
             <iframe
               className="absolute inset-0 h-full w-full"
@@ -63,13 +62,9 @@ export default function VideoFeature() {
                   שרון אלימלך
                 </span>
               </span>
-              <motion.span
-                whileHover={{ scale: 1.08 }}
-                whileTap={{ scale: 0.95 }}
-                className="relative flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-l from-bronze via-gold to-gold-soft text-obsidian shadow-lg"
-              >
-                <Play className="h-8 w-8 translate-x-0.5 fill-obsidian" />
-              </motion.span>
+              <span className="relative flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-l from-bronze via-gold to-gold-soft text-obsidian shadow-lg transition-transform duration-300 group-hover:scale-105">
+                <Play className="relative h-8 w-8 translate-x-0.5 fill-obsidian" />
+              </span>
               {!YOUTUBE_ID && (
                 <span className="absolute bottom-6 text-xs font-light text-muted">
                   (הוסיפו מזהה YouTube ב־VideoFeature.tsx כדי להפעיל)
