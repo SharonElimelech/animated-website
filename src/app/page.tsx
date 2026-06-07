@@ -1,15 +1,20 @@
 import MainLayout from "@/components/layout/MainLayout";
-import HeroVideoScrub from "@/components/sections/HeroVideoScrub";
-import Vision from "@/components/sections/Vision";
-import PracticeAreas from "@/components/sections/PracticeAreas";
+import Hero from "@/components/sections/Hero";
+import About from "@/components/sections/About";
+import VideoFeature from "@/components/sections/VideoFeature";
+import Process from "@/components/sections/Process";
+import Faq from "@/components/sections/Faq";
+import Contact from "@/components/sections/Contact";
 
 export default function Home() {
   return (
     <MainLayout>
-      <HeroVideoScrub />
-      <Vision />
-      <PracticeAreas />
-      {/* Next sections: EditorialPortrait, Contact */}
+      <Hero />
+      <About />
+      <VideoFeature />
+      <Process />
+      <Faq />
+      <Contact />
     </MainLayout>
   );
 }

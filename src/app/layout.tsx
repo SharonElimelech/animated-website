@@ -1,20 +1,20 @@
 import type { Metadata } from "next";
-import { Frank_Ruhl_Libre, Heebo, Cormorant_Garamond } from "next/font/google";
+import { Frank_Ruhl_Libre, Assistant, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 
-/* Elegant Hebrew serif — display headings */
+/* Elegant Hebrew serif — all major headings & logo */
 const frank = Frank_Ruhl_Libre({
   variable: "--font-frank",
   subsets: ["hebrew", "latin"],
-  weight: ["300", "400", "500", "700", "900"],
+  weight: ["300", "400", "500", "600", "700", "900"],
   display: "swap",
 });
 
-/* Clean, wide Hebrew sans — body */
-const heebo = Heebo({
-  variable: "--font-heebo",
+/* Clean Hebrew sans — body text & navigation */
+const assistant = Assistant({
+  variable: "--font-assistant",
   subsets: ["hebrew", "latin"],
-  weight: ["300", "400", "500", "700"],
+  weight: ["300", "400", "500", "600", "700", "800"],
   display: "swap",
 });
 
@@ -48,7 +48,7 @@ export default function RootLayout({
     <html
       lang="he"
       dir="rtl"
-      className={`${frank.variable} ${heebo.variable} ${cormorant.variable} h-full antialiased`}
+      className={`${frank.variable} ${assistant.variable} ${cormorant.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-obsidian text-ink">{children}</body>
     </html>
