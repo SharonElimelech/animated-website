@@ -37,7 +37,7 @@ export default function Hero() {
         {/* B. Dual-color massive headline (Heebo Black) */}
         <motion.h1
           variants={item}
-          className="text-shadow-lux mt-7 font-heebo text-5xl font-black leading-[0.95] tracking-tight sm:text-7xl lg:text-8xl"
+          className="text-shadow-lux mt-7 font-heebo text-4xl font-black leading-[0.98] tracking-tight sm:text-7xl lg:text-8xl"
         >
           <span className="gold-text block">החובות חונקים?</span>
           <span className="block text-white">אנחנו כאן</span>

@@ -49,7 +49,7 @@ export default function Navbar() {
         </a>
 
         {/* Centered links */}
-        <ul className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-9 md:flex">
+        <ul className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-9 lg:flex">
           {LINKS.map((l) => (
             <li key={l.href}>
               <a
@@ -64,7 +64,7 @@ export default function Navbar() {
         </ul>
 
         {/* Left: search + language switcher */}
-        <div className="hidden items-center gap-5 md:flex">
+        <div className="hidden items-center gap-5 lg:flex">
           <button
             aria-label="חיפוש"
             className="text-ink/70 transition-colors hover:text-gold"
@@ -82,7 +82,7 @@ export default function Navbar() {
         <button
           onClick={() => setOpen((v) => !v)}
           aria-label="תפריט"
-          className="text-ink md:hidden"
+          className="text-ink lg:hidden"
         >
           {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
@@ -93,7 +93,7 @@ export default function Navbar() {
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mx-auto mt-3 max-w-6xl overflow-hidden rounded-3xl border border-white/10 bg-black/70 backdrop-blur-xl md:hidden"
+          className="mx-auto mt-3 max-w-6xl overflow-hidden rounded-3xl border border-white/10 bg-black/70 backdrop-blur-xl lg:hidden"
         >
           <ul className="flex flex-col gap-1 px-6 py-4">
             {LINKS.map((l) => (

@@ -36,6 +36,8 @@
   html {
     scroll-behavior: smooth;
     background-color: var(--color-obsidian);
+    /* offset anchored sections below the fixed navbar */
+    scroll-padding-top: 6.5rem;
   }
 
   body {

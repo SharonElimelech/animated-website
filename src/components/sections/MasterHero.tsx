@@ -78,7 +78,7 @@ export default function MasterHero() {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: EASE, delay: 0.32 }}
-            className="mt-5 font-serif text-5xl font-medium leading-[1.05] gold-text sm:text-7xl lg:text-8xl"
+            className="mt-5 font-serif text-4xl font-medium leading-[1.08] gold-text sm:text-7xl lg:text-8xl"
           >
             נלחמים עבור
             <br />
