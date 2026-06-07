@@ -4,16 +4,12 @@ import { useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Scale } from "lucide-react";
 import { whatsappLink } from "@/lib/site";
+import { useI18n } from "@/lib/i18n";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-/**
- * Master Hero — the top-level 100vh entry point (replicates the reference
- * layout, mirrored to RTL). As the user scrolls past it, the section fades and
- * the fixed video-scrubbing background (behind it) takes over for the rest of
- * the site.
- */
 export default function MasterHero() {
+  const { t } = useI18n();
   const ref = useRef<HTMLDivElement>(null);
   const [imgOk, setImgOk] = useState(true);
 
@@ -21,7 +17,6 @@ export default function MasterHero() {
     target: ref,
     offset: ["start start", "end start"],
   });
-  // Content fades first, then the background dissolves to reveal the video.
   const contentOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
   const contentY = useTransform(scrollYProgress, [0, 0.6], [0, -60]);
   const bgOpacity = useTransform(scrollYProgress, [0.15, 1], [1, 0]);
@@ -29,7 +24,7 @@ export default function MasterHero() {
 
   return (
     <section id="home" ref={ref} className="relative h-screen w-full">
-      {/* Background image (with elegant fallback) */}
+      {/* Background */}
       <motion.div
         style={{ opacity: bgOpacity, scale: bgScale }}
         className="absolute inset-0 transform-gpu will-change-transform"
@@ -46,83 +41,77 @@ export default function MasterHero() {
         ) : (
           <Fallback />
         )}
-
-        {/* Legibility: darken the right (where RTL text sits) + warm gold glow left */}
-        <div
-          aria-hidden
-          className="absolute inset-0 bg-gradient-to-l from-obsidian via-obsidian/45 to-transparent"
-        />
-        <div
-          aria-hidden
-          className="absolute inset-0 bg-[radial-gradient(circle_at_15%_45%,rgba(212,175,55,0.22),transparent_48%)]"
-        />
+        {/* darken the text side + warm gold glow on the other */}
+        <div aria-hidden className="absolute inset-0 bg-gradient-to-l from-obsidian via-obsidian/45 to-transparent rtl:bg-gradient-to-l ltr:bg-gradient-to-r" />
+        <div aria-hidden className="absolute inset-0 bg-[radial-gradient(circle_at_15%_45%,rgba(212,175,55,0.22),transparent_48%)]" />
         <div aria-hidden className="absolute inset-0 bg-obsidian/20" />
       </motion.div>
 
-      {/* Content — mirrored to the RIGHT for RTL */}
+      {/* Content — start side (right in RTL, left in LTR) */}
       <motion.div
         style={{ opacity: contentOpacity, y: contentY }}
         className="relative z-10 mx-auto flex h-full max-w-7xl items-center px-6 lg:px-10"
       >
-        <div className="max-w-xl text-right">
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: EASE, delay: 0.2 }}
-            className="text-shadow-lux text-sm font-light tracking-wide text-ink/80"
-          >
-            צריכים עזרה משפטית?
-          </motion.p>
-
+        <div className="max-w-xl text-start">
           <motion.h1
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: EASE, delay: 0.32 }}
-            className="mt-5 font-serif text-4xl font-medium leading-[1.08] gold-text sm:text-7xl lg:text-8xl"
+            transition={{ duration: 1, ease: EASE, delay: 0.3 }}
+            className="font-serif text-4xl font-bold leading-[1.12] sm:text-6xl lg:text-7xl"
           >
-            נלחמים עבור
-            <br />
-            הצדק שלך
+            <span className="block gold-text">
+              {t("החובות חונקים?", "Are debts choking you?")}
+            </span>
+            <span className="block text-[#f4ecdd] [text-shadow:0_2px_18px_rgba(0,0,0,0.75)]">
+              {t("אנחנו כאן לעצור את זה.", "We're here to stop it.")}
+            </span>
           </motion.h1>
 
           <motion.p
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, ease: EASE, delay: 0.5 }}
-            className="text-shadow-lux mr-auto mt-8 max-w-md text-base font-light leading-relaxed text-ink/85 sm:text-lg"
+            className="me-auto mt-7 max-w-md font-serif text-base font-light italic tracking-wide text-gold/90 [text-shadow:0_1px_12px_rgba(0,0,0,0.6)] sm:text-lg"
           >
-            משרד עורכי דין המעניק מעטפת משפטית מקיפה. אנו פועלים בגישה אישית
-            לכל לקוח ומשתמשים בשיטות מתקדמות ויצירתיות לפתרון מלא של בעיותיו.
+            {t(
+              "משרד עורכי דין מומחה — הגנה וליווי מלא בהליכי חובות ובשיקום כלכלי.",
+              "Expert law office — full protection and guidance through debt and economic recovery.",
+            )}
           </motion.p>
 
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, ease: EASE, delay: 0.66 }}
-            className="mt-10 flex flex-wrap items-center gap-4"
+            className="mt-9 flex flex-wrap items-center gap-4"
           >
             <a
-              href={whatsappLink("היי, אשמח לייעוץ ראשוני חינם")}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="gold-bg rounded-full px-8 py-3.5 text-sm font-bold text-obsidian shadow-[0_0_25px_-6px_rgba(212,175,55,0.6)] transition-all duration-300 hover:brightness-110"
+              href="#calculator"
+              className="rounded-full border border-gold/60 bg-gold/15 px-8 py-3.5 text-sm font-semibold text-gold shadow-[0_0_25px_-8px_rgba(212,175,55,0.55)] backdrop-blur-md transition-all duration-300 hover:bg-gold/25"
             >
-              לייעוץ ראשוני חינם
+              {t("בדיקת זכאות", "Eligibility Check")}
             </a>
             <a
-              href="#about"
-              className="rounded-full border border-white/40 px-8 py-3.5 text-sm font-medium text-ink transition-all duration-300 hover:border-white hover:bg-white/10"
+              href={whatsappLink(
+                t(
+                  "היי, זו פנייה דחופה — אשמח לתיאום שיחת חירום",
+                  "Hi, this is urgent — I'd like to arrange an emergency call",
+                ),
+              )}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-full border border-white/25 bg-white/5 px-8 py-3.5 text-sm font-medium text-ink backdrop-blur-md transition-all duration-300 hover:border-gold/50 hover:bg-white/10"
             >
-              אודות המשרד
+              {t("תיאום שיחת חירום", "Emergency Call")}
             </a>
           </motion.div>
         </div>
       </motion.div>
 
-      {/* Pagination dots (bottom-right for RTL) */}
+      {/* Pagination dots (end side) */}
       <motion.div
         style={{ opacity: contentOpacity }}
-        className="absolute bottom-10 right-8 z-10 flex items-center gap-2.5 lg:right-12"
+        className="absolute bottom-10 end-8 z-10 flex items-center gap-2.5 lg:end-12"
       >
         <span className="flex h-3 w-3 items-center justify-center rounded-full border border-gold">
           <span className="h-1.5 w-1.5 rounded-full bg-gold" />

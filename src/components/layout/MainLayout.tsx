@@ -5,6 +5,7 @@ import ScrubBackground from "./ScrubBackground";
 import ScrollProgress from "@/components/ui/ScrollProgress";
 import WhatsappButton from "@/components/ui/WhatsappButton";
 import GrainOverlay from "@/components/ui/GrainOverlay";
+import { LanguageProvider } from "@/lib/i18n";
 
 export default function MainLayout({ children }: { children: ReactNode }) {
   return (
@@ -12,11 +13,13 @@ export default function MainLayout({ children }: { children: ReactNode }) {
       {/* Persistent fixed video behind everything */}
       <ScrubBackground />
 
-      <ScrollProgress />
-      <Navbar />
-      <main className="relative z-10 flex-1">{children}</main>
-      <Footer />
-      <WhatsappButton />
+      <LanguageProvider>
+        <ScrollProgress />
+        <Navbar />
+        <main className="relative z-10 flex-1">{children}</main>
+        <Footer />
+        <WhatsappButton />
+      </LanguageProvider>
 
       {/* Cinematic grain over the whole site */}
       <GrainOverlay />

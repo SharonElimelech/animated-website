@@ -3,17 +3,20 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { Menu, X, Search } from "lucide-react";
+import { Menu, X } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
+import SiteSearch from "./SiteSearch";
 
 const LINKS = [
-  { label: "בית", href: "#home" },
-  { label: "אודות", href: "#about" },
-  { label: "מחשבון חובות", href: "#calculator" },
-  { label: "המסלול", href: "#process" },
-  { label: "צור קשר", href: "#contact" },
+  { he: "בית", en: "Home", href: "#home" },
+  { he: "אודות", en: "About", href: "#about" },
+  { he: "מחשבון חובות", en: "Calculator", href: "#calculator" },
+  { he: "המסלול", en: "Process", href: "#process" },
+  { he: "צור קשר", en: "Contact", href: "#contact" },
 ];
 
 export default function Navbar() {
+  const { t, lang, setLang } = useI18n();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
 
@@ -23,6 +26,24 @@ export default function Navbar() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  const LangSwitch = () => (
+    <span className="text-shadow-lux text-sm font-light tracking-wide">
+      <button
+        onClick={() => setLang("he")}
+        className={lang === "he" ? "text-gold" : "text-ink/70 hover:text-ink"}
+      >
+        עב
+      </button>
+      <span className="mx-1.5 text-white/30">|</span>
+      <button
+        onClick={() => setLang("en")}
+        className={lang === "en" ? "text-gold" : "text-ink/70 hover:text-ink"}
+      >
+        EN
+      </button>
+    </span>
+  );
 
   return (
     <motion.header
@@ -36,11 +57,11 @@ export default function Navbar() {
           scrolled ? "bg-black/40" : "bg-white/[0.03]"
         }`}
       >
-        {/* Brand — right (RTL start) */}
-        <a href="#home" aria-label="הדר אלימלך — דף הבית" className="group flex items-center">
+        {/* Brand — start side (right in RTL, left in LTR) */}
+        <a href="#home" aria-label={t("הדר אלימלך — דף הבית", "Hadar Elimelech — Home")} className="group flex items-center">
           <Image
             src="/logo-float.png"
-            alt="הדר אלימלך — משרד עורכי דין"
+            alt={t("הדר אלימלך — משרד עורכי דין", "Hadar Elimelech — Law Office")}
             width={331}
             height={251}
             priority
@@ -56,32 +77,23 @@ export default function Navbar() {
                 href={l.href}
                 className="group relative text-shadow-lux text-sm font-light tracking-wide text-ink/80 transition-colors hover:text-ink"
               >
-                {l.label}
-                <span className="absolute -bottom-1.5 right-0 h-px w-0 bg-gold transition-all duration-300 group-hover:w-full" />
+                {t(l.he, l.en)}
+                <span className="absolute -bottom-1.5 end-0 h-px w-0 bg-gold transition-all duration-300 group-hover:w-full" />
               </a>
             </li>
           ))}
         </ul>
 
-        {/* Left: search + language switcher */}
+        {/* End side: search + language switcher */}
         <div className="hidden items-center gap-5 lg:flex">
-          <button
-            aria-label="חיפוש"
-            className="text-ink/70 transition-colors hover:text-gold"
-          >
-            <Search className="h-5 w-5" strokeWidth={1.6} />
-          </button>
-          <span className="text-shadow-lux text-sm font-light tracking-wide text-ink/70">
-            <span className="text-gold">עב</span>
-            <span className="mx-1.5 text-white/30">|</span>
-            <span className="cursor-pointer transition-colors hover:text-ink">EN</span>
-          </span>
+          <SiteSearch />
+          <LangSwitch />
         </div>
 
         {/* Mobile toggle */}
         <button
           onClick={() => setOpen((v) => !v)}
-          aria-label="תפריט"
+          aria-label={t("תפריט", "Menu")}
           className="text-ink lg:hidden"
         >
           {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -103,10 +115,14 @@ export default function Navbar() {
                   onClick={() => setOpen(false)}
                   className="block py-3 text-base font-light text-ink/80 hover:text-gold"
                 >
-                  {l.label}
+                  {t(l.he, l.en)}
                 </a>
               </li>
             ))}
+            <li className="mt-2 flex items-center justify-between border-t border-line pt-3">
+              <SiteSearch />
+              <LangSwitch />
+            </li>
           </ul>
         </motion.div>
       )}

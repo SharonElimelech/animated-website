@@ -4,8 +4,10 @@ import { useState } from "react";
 import { Phone, MapPin, ArrowLeft } from "lucide-react";
 import { Reveal } from "@/components/ui/Reveal";
 import { SITE, telLink, mapsEmbed, whatsappLink } from "@/lib/site";
+import { useI18n } from "@/lib/i18n";
 
 export default function Contact() {
+  const { t } = useI18n();
   const [name, setName] = useState("");
   const [prefix, setPrefix] = useState("050");
   const [phone, setPhone] = useState("");
@@ -14,9 +16,9 @@ export default function Contact() {
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     const text =
-      `שם: ${name}\n` +
-      `טלפון: ${prefix}-${phone}\n` +
-      (message ? `הודעה: ${message}` : "");
+      `${t("שם", "Name")}: ${name}\n` +
+      `${t("טלפון", "Phone")}: ${prefix}-${phone}\n` +
+      (message ? `${t("הודעה", "Message")}: ${message}` : "");
     window.open(whatsappLink(text), "_blank", "noopener,noreferrer");
   };
 
@@ -27,7 +29,7 @@ export default function Contact() {
     >
       <Reveal className="mb-14 text-center" amount={0.6}>
         <span className="text-shadow-lux text-xs font-light tracking-[0.4em] text-gold/85">
-          תהיו איתנו בקשר
+          {t("תהיו איתנו בקשר", "Get in touch")}
         </span>
       </Reveal>
 
@@ -36,16 +38,20 @@ export default function Contact() {
         <div>
           <Reveal amount={0.4}>
             <h2 className="font-serif text-4xl font-bold leading-tight text-ink [text-shadow:0_2px_30px_rgba(0,0,0,0.85)] sm:text-5xl lg:text-6xl">
-              ייעוץ משפטי ראשוני
+              {t("ייעוץ משפטי ראשוני", "Initial legal consultation")}
               <br />
-              <span className="text-gradient-gold">ללא התחייבות</span>
+              <span className="text-gradient-gold">
+                {t("ללא התחייבות", "with no obligation")}
+              </span>
             </h2>
           </Reveal>
 
           <Reveal delay={0.1} amount={0.5}>
             <p className="text-shadow-lux mt-6 max-w-md text-base font-light leading-relaxed text-muted">
-              המשרד זמין עבורכם לכל שאלה. אנחנו כאן כדי להעניק לכם את השקט הנפשי
-              שמגיע לכם ולהוציא אתכם לדרך חדשה.
+              {t(
+                "המשרד זמין עבורכם לכל שאלה. אנחנו כאן כדי להעניק לכם את השקט הנפשי שמגיע לכם ולהוציא אתכם לדרך חדשה.",
+                "Our office is available for any question. We're here to give you the peace of mind you deserve and set you on a new path.",
+              )}
             </p>
           </Reveal>
 
@@ -57,9 +63,9 @@ export default function Contact() {
               <span className="flex h-11 w-11 items-center justify-center rounded-full bg-gold/10 text-gold transition-colors group-hover:bg-gold group-hover:text-obsidian">
                 <Phone className="h-5 w-5" strokeWidth={1.6} />
               </span>
-              <span className="text-right">
+              <span className="text-end">
                 <span className="block text-xs font-light text-muted">
-                  חייגו עכשיו
+                  {t("חייגו עכשיו", "Call now")}
                 </span>
                 <span className="mt-1 block text-base font-bold text-ink" dir="ltr">
                   {SITE.phone}
@@ -71,12 +77,12 @@ export default function Contact() {
               <span className="flex h-11 w-11 items-center justify-center rounded-full bg-gold/10 text-gold">
                 <MapPin className="h-5 w-5" strokeWidth={1.6} />
               </span>
-              <span className="text-right">
+              <span className="text-end">
                 <span className="block text-xs font-light text-muted">
-                  כתובת המשרד
+                  {t("כתובת המשרד", "Office address")}
                 </span>
                 <span className="mt-1 block text-base font-bold text-ink">
-                  {SITE.address}
+                  {t(SITE.address, "Kochav HaShachar 3, Ashdod")}
                 </span>
               </span>
             </div>
@@ -85,7 +91,7 @@ export default function Contact() {
           <Reveal delay={0.2} amount={0.3}>
             <div className="mt-6 overflow-hidden rounded-xl border border-line">
               <iframe
-                title="מפת המשרד"
+                title={t("מפת המשרד", "Office map")}
                 src={mapsEmbed}
                 className="h-64 w-full grayscale"
                 loading="lazy"
@@ -97,19 +103,16 @@ export default function Contact() {
 
         {/* Right: form */}
         <Reveal amount={0.2} fade>
-          <form
-            onSubmit={submit}
-            className="glass-dark rounded-2xl p-8 lg:p-10"
-          >
+          <form onSubmit={submit} className="glass-dark rounded-2xl p-8 lg:p-10">
             <h3 className="font-serif text-3xl font-bold text-ink">
-              שלחו פנייה דיסקרטית
+              {t("שלחו פנייה דיסקרטית", "Send a discreet inquiry")}
             </h3>
             <p className="mt-2 text-sm font-light text-muted">
-              נחזור אליכם תוך 24 שעות עם מענה
+              {t("נחזור אליכם תוך 24 שעות עם מענה", "We'll get back to you within 24 hours")}
             </p>
 
             <div className="mt-8 space-y-6">
-              <Field label="שם מלא">
+              <Field label={t("שם מלא", "Full name")}>
                 <input
                   type="text"
                   required
@@ -119,7 +122,7 @@ export default function Contact() {
                 />
               </Field>
 
-              <Field label="טלפון נייד">
+              <Field label={t("טלפון נייד", "Mobile phone")}>
                 <div className="flex gap-3">
                   <input
                     type="tel"
@@ -135,7 +138,7 @@ export default function Contact() {
                     value={prefix}
                     onChange={(e) => setPrefix(e.target.value)}
                     className="rounded-lg border border-line bg-obsidian px-3 py-3 text-ink outline-none focus:border-gold/60"
-                    aria-label="קידומת"
+                    aria-label={t("קידומת", "Prefix")}
                   >
                     {["050", "052", "053", "054", "055", "058"].map((p) => (
                       <option key={p}>{p}</option>
@@ -144,7 +147,7 @@ export default function Contact() {
                 </div>
               </Field>
 
-              <Field label="הודעה (אופציונלי)">
+              <Field label={t("הודעה (אופציונלי)", "Message (optional)")}>
                 <textarea
                   rows={4}
                   value={message}
@@ -157,8 +160,8 @@ export default function Contact() {
                 type="submit"
                 className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-l from-bronze via-gold to-gold-soft px-8 py-4 text-sm font-medium text-obsidian transition-all duration-300 hover:brightness-110"
               >
-                לשליחת הבקשה לייעוץ
-                <ArrowLeft className="h-4 w-4" />
+                {t("לשליחת הבקשה לייעוץ", "Send consultation request")}
+                <ArrowLeft className="h-4 w-4 rtl:rotate-0 ltr:-scale-x-100" />
               </button>
             </div>
           </form>
@@ -170,7 +173,7 @@ export default function Contact() {
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <label className="block text-right">
+    <label className="block text-start">
       <span className="mb-2 block text-xs font-light tracking-wide text-muted">
         {label}
       </span>

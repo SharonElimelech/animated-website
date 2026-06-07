@@ -1,8 +1,7 @@
 import MainLayout from "@/components/layout/MainLayout";
 import MasterHero from "@/components/sections/MasterHero";
-import Hero from "@/components/sections/Hero";
-import DebtCalculator from "@/components/sections/DebtCalculator";
 import About from "@/components/sections/About";
+import DebtCalculator from "@/components/sections/DebtCalculator";
 import VideoFeature from "@/components/sections/VideoFeature";
 import Process from "@/components/sections/Process";
 import Faq from "@/components/sections/Faq";
@@ -12,9 +11,8 @@ export default function Home() {
   return (
     <MainLayout>
       <MasterHero />
-      <Hero />
-      <DebtCalculator />
       <About />
+      <DebtCalculator />
       <VideoFeature />
       <Process />
       <Faq />

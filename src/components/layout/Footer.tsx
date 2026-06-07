@@ -1,4 +1,7 @@
+"use client";
+
 import { SITE, whatsappLink } from "@/lib/site";
+import { useI18n } from "@/lib/i18n";
 
 function FacebookIcon({ className }: { className?: string }) {
   return (
@@ -17,13 +20,14 @@ function InstagramIcon({ className }: { className?: string }) {
 }
 
 const NAV = [
-  { label: "אודות המשרד", href: "#about" },
-  { label: "המסלול שלך", href: "#process" },
-  { label: "שאלות נפוצות", href: "#faq" },
-  { label: "צור קשר", href: "#contact" },
+  { he: "אודות המשרד", en: "About", href: "#about" },
+  { he: "המסלול שלך", en: "Your Process", href: "#process" },
+  { he: "שאלות נפוצות", en: "FAQ", href: "#faq" },
+  { he: "צור קשר", en: "Contact", href: "#contact" },
 ];
 
 export default function Footer() {
+  const { t } = useI18n();
   return (
     <footer className="relative z-10 border-t border-line bg-obsidian/80 px-6 py-16 backdrop-blur-xl lg:px-10">
       <div className="mx-auto max-w-7xl">
@@ -46,7 +50,7 @@ export default function Footer() {
                 href={l.href}
                 className="text-sm font-light text-muted transition-colors hover:text-gold"
               >
-                {l.label}
+                {t(l.he, l.en)}
               </a>
             ))}
           </nav>
@@ -54,8 +58,8 @@ export default function Footer() {
           {/* Social */}
           <div className="flex items-center gap-3">
             {[
-              { Icon: FacebookIcon, href: SITE.social.facebook, label: "פייסבוק" },
-              { Icon: InstagramIcon, href: SITE.social.instagram, label: "אינסטגרם" },
+              { Icon: FacebookIcon, href: SITE.social.facebook, label: t("פייסבוק", "Facebook") },
+              { Icon: InstagramIcon, href: SITE.social.instagram, label: t("אינסטגרם", "Instagram") },
             ].map(({ Icon, href, label }) => (
               <a
                 key={label}
@@ -70,7 +74,7 @@ export default function Footer() {
             ))}
             <a
               href={whatsappLink()}
-              aria-label="וואטסאפ"
+              aria-label={t("וואטסאפ", "WhatsApp")}
               target="_blank"
               rel="noopener noreferrer"
               className="flex h-10 w-10 items-center justify-center rounded-full border border-line text-muted transition-all hover:border-gold/50 hover:text-gold"
@@ -86,14 +90,18 @@ export default function Footer() {
 
         <div className="mt-8 flex flex-col items-center justify-between gap-4 text-xs font-light text-muted/60 sm:flex-row">
           <p>
-            © {new Date().getFullYear()} כל הזכויות שמורות למשרד עו״ד {SITE.name}.
+            ©{" "}{new Date().getFullYear()}{" "}
+            {t(
+              `כל הזכויות שמורות למשרד עו״ד ${SITE.name}.`,
+              `All rights reserved — ${SITE.nameEn} Law Office.`,
+            )}
           </p>
           <div className="flex gap-6">
             <a href="#" className="transition-colors hover:text-gold">
-              מדיניות פרטיות
+              {t("מדיניות פרטיות", "Privacy Policy")}
             </a>
             <a href="#" className="transition-colors hover:text-gold">
-              הצהרת נגישות
+              {t("הצהרת נגישות", "Accessibility")}
             </a>
           </div>
         </div>
