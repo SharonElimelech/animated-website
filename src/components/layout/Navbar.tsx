@@ -37,39 +37,41 @@ export default function Navbar() {
             : "glass"
         }`}
       >
-        {/* Brand */}
+        {/* Brand — on the right (RTL), larger */}
         <a href="#" className="group flex items-center gap-2.5">
           <Scale
-            className="h-5 w-5 text-gold transition-transform duration-500 group-hover:rotate-6"
+            className="h-6 w-6 text-gold transition-transform duration-500 group-hover:rotate-6"
             strokeWidth={1.4}
           />
-          <span className="font-serif text-lg tracking-[0.04em] text-ink">
+          <span className="font-serif text-xl tracking-[0.05em] text-ink sm:text-2xl">
             הדר אלימלך
           </span>
         </a>
 
-        {/* Desktop links */}
-        <ul className="hidden items-center gap-9 md:flex">
-          {LINKS.map((l) => (
-            <li key={l.href}>
-              <a
-                href={l.href}
-                className="group relative text-sm font-light tracking-wide text-ink/80 transition-colors hover:text-ink"
-              >
-                {l.label}
-                <span className="absolute -bottom-1.5 right-0 h-px w-0 bg-gold transition-all duration-300 group-hover:w-full" />
-              </a>
-            </li>
-          ))}
-        </ul>
+        {/* Left group: links + CTA */}
+        <div className="hidden items-center gap-8 md:flex lg:gap-10">
+          <ul className="flex items-center gap-8 lg:gap-9">
+            {LINKS.map((l) => (
+              <li key={l.href}>
+                <a
+                  href={l.href}
+                  className="group relative text-sm font-light tracking-wide text-ink/80 transition-colors hover:text-ink"
+                >
+                  {l.label}
+                  <span className="absolute -bottom-1.5 right-0 h-px w-0 bg-gold transition-all duration-300 group-hover:w-full" />
+                </a>
+              </li>
+            ))}
+          </ul>
 
-        {/* CTA — gold border + glow */}
-        <a
-          href="#contact"
-          className="hidden rounded-full border border-gold px-6 py-2 text-sm font-medium tracking-wide text-gold shadow-[0_0_20px_-2px_rgba(212,175,55,0.45)] transition-all duration-300 hover:bg-gold hover:text-obsidian hover:shadow-[0_0_28px_0_rgba(212,175,55,0.6)] md:inline-block"
-        >
-          ייעוץ משפטי
-        </a>
+          {/* CTA — gold border + glow */}
+          <a
+            href="#contact"
+            className="rounded-full border border-gold px-6 py-2 text-sm font-medium tracking-wide text-gold shadow-[0_0_20px_-2px_rgba(212,175,55,0.45)] transition-all duration-300 hover:bg-gold hover:text-obsidian hover:shadow-[0_0_28px_0_rgba(212,175,55,0.6)]"
+          >
+            ייעוץ משפטי
+          </a>
+        </div>
 
         {/* Mobile toggle */}
         <button

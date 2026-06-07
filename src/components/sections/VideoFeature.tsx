@@ -18,7 +18,7 @@ export default function VideoFeature() {
       className="relative mx-auto max-w-4xl px-6 py-28 text-center lg:py-36"
     >
       <Reveal amount={0.6}>
-        <span className="text-xs font-light tracking-[0.4em] text-gold/85">
+        <span className="text-shadow-lux text-xs font-light tracking-[0.4em] text-gold/85">
           מי שפועל · שולט בסיטואציה
         </span>
       </Reveal>

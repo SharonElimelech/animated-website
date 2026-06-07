@@ -32,7 +32,7 @@ export default function Process() {
       className="relative mx-auto max-w-7xl px-6 py-28 text-center lg:px-10 lg:py-40"
     >
       <Reveal amount={0.6}>
-        <span className="text-xs font-light tracking-[0.4em] text-gold/85">
+        <span className="text-shadow-lux text-xs font-light tracking-[0.4em] text-gold/85">
           התהליך שלכם
         </span>
       </Reveal>
@@ -44,7 +44,7 @@ export default function Process() {
       </Reveal>
 
       <Reveal delay={0.1} amount={0.5}>
-        <p className="mx-auto mt-6 max-w-2xl text-base font-light leading-relaxed text-muted">
+        <p className="text-shadow-lux mx-auto mt-6 max-w-2xl text-base font-light leading-relaxed text-muted">
           אנחנו מלווים אתכם צעד אחר צעד, בשקיפות מלאה, עד לניצחון הסופי.
         </p>
       </Reveal>

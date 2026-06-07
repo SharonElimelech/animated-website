@@ -3,8 +3,8 @@ export const SITE = {
   name: "הדר אלימלך",
   nameEn: "HADAR ELIMELECH",
   tagline: "LAW FIRM & NOTARY",
-  phone: "052-6288112",
-  phoneIntl: "972526288112", // for tel:/wa.me links
+  phone: "052-4925422",
+  phoneIntl: "972524925422", // for tel:/wa.me links
   address: "כוכב השחר 3, אשדוד",
   // TODO: replace with the firm's real profile URLs
   social: {

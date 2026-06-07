@@ -26,7 +26,7 @@ export default function Contact() {
       className="relative mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-40"
     >
       <Reveal className="mb-14 text-center" amount={0.6}>
-        <span className="text-xs font-light tracking-[0.4em] text-gold/85">
+        <span className="text-shadow-lux text-xs font-light tracking-[0.4em] text-gold/85">
           תהיו איתנו בקשר
         </span>
       </Reveal>
@@ -43,7 +43,7 @@ export default function Contact() {
           </Reveal>
 
           <Reveal delay={0.1} amount={0.5}>
-            <p className="mt-6 max-w-md text-base font-light leading-relaxed text-muted">
+            <p className="text-shadow-lux mt-6 max-w-md text-base font-light leading-relaxed text-muted">
               המשרד זמין עבורכם לכל שאלה. אנחנו כאן כדי להעניק לכם את השקט הנפשי
               שמגיע לכם ולהוציא אתכם לדרך חדשה.
             </p>

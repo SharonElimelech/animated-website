@@ -1,16 +1,36 @@
 import { Reveal, StaggerGroup, StaggerItem } from "@/components/ui/Reveal";
 import Portrait from "@/components/ui/Portrait";
 import { SITE } from "@/lib/site";
-import { Receipt, Ban, Handshake, ShieldCheck, Award } from "lucide-react";
+import { Handshake, Gavel, RefreshCw, Building2, Award } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
 type Service = { icon: LucideIcon; title: string; description: string };
 
 const SERVICES: Service[] = [
-  { icon: Receipt, title: "מחיקת חובות", description: "הפטר מלא בהליך חדלות פירעון" },
-  { icon: Ban, title: "ביטול עיקולים", description: "חשבון בנק, משכורת ורישיון" },
-  { icon: Handshake, title: "הסדרי נושים", description: "מו״מ ללא הליכים משפטיים" },
-  { icon: ShieldCheck, title: "הגנת נכסים", description: "שמירה על בית המגורים" },
+  {
+    icon: Handshake,
+    title: "הסדרי חובות מורכבים",
+    description:
+      "מו״מ מול בנקים, נושים פרטיים וספקים — לצמצום והסדרת חובות מחוץ לכותלי בית המשפט.",
+  },
+  {
+    icon: Gavel,
+    title: "הליכי הוצאה לפועל",
+    description:
+      "ביטול עיקולים, הסרת הגבלות בנק ויציאה מהארץ ואיחוד תיקים — מענה מיידי ואפקטיבי.",
+  },
+  {
+    icon: RefreshCw,
+    title: "חדלות פירעון ושיקום כלכלי",
+    description:
+      "ליווי יחידים בהליך החדש עד הפטר חלוט, מחיקת חובות ופתיחת דף חדש.",
+  },
+  {
+    icon: Building2,
+    title: "פירוק והבראת חברות",
+    description:
+      "ייעוץ אסטרטגי לחברות ועסקים במצוקה — הקפאת הליכים והבראה מבנית.",
+  },
 ];
 
 export default function About() {
@@ -24,7 +44,7 @@ export default function About() {
         <div>
           <Reveal className="mb-6 flex items-center gap-4" amount={0.6}>
             <span className="h-px w-10 bg-gold" />
-            <span className="text-xs font-light tracking-[0.4em] text-gold/85">
+            <span className="text-shadow-lux text-xs font-light tracking-[0.4em] text-gold/85">
               אודות המשרד
             </span>
           </Reveal>
@@ -38,9 +58,10 @@ export default function About() {
           </Reveal>
 
           <Reveal delay={0.1} amount={0.5}>
-            <blockquote className="mt-8 border-r-2 border-gold/60 pr-6 text-base font-light leading-relaxed text-muted sm:text-lg">
-              ״הדרך לחופש כלכלי מתחילה בהבנה שאין מצר ללא פתרון. המשרד שלנו הוקם
-              כדי לספק לכם את המעטפת המשפטית והאסטרטגיה המדויקת ביותר.״
+            <blockquote className="text-shadow-lux mt-8 border-r-2 border-gold/60 pr-6 text-base font-light leading-relaxed text-muted sm:text-lg">
+              ״כל משבר כלכלי הוא נקודת מפנה. אנו בונים עבורכם אסטרטגיה מותאמת
+              אישית, עם ליווי צמוד ודיסקרטי — מהצעד הראשון ועד להחזרת השליטה
+              המלאה על חייכם.״
             </blockquote>
           </Reveal>
 

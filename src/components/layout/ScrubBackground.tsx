@@ -32,7 +32,7 @@ export default function ScrubBackground() {
   });
 
   // Scrim strengthens as we descend → lower sections read calm and solid.
-  const scrimOpacity = useTransform(smooth, [0, 0.5, 1], [0.4, 0.55, 0.72]);
+  const scrimOpacity = useTransform(smooth, [0, 0.5, 1], [0.5, 0.64, 0.8]);
 
   useEffect(() => {
     const video = videoRef.current;

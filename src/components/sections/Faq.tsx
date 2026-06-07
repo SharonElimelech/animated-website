@@ -55,7 +55,7 @@ export default function Faq() {
       className="relative mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-40"
     >
       <Reveal className="text-center" amount={0.6}>
-        <span className="text-xs font-light tracking-[0.4em] text-gold/85">
+        <span className="text-shadow-lux text-xs font-light tracking-[0.4em] text-gold/85">
           מרכז מידע
         </span>
         <h2 className="mt-6 font-serif text-4xl font-bold text-ink [text-shadow:0_2px_30px_rgba(0,0,0,0.85)] sm:text-5xl">
