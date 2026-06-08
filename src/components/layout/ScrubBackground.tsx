@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useSpring, useMotionValueEvent } from "framer-motion";
+import FrameScrub from "./FrameScrub";
 
 /**
  * Apple-style canvas-video scrubbing — scroll-tied, smooth, bright, sharp.
@@ -26,6 +27,10 @@ export default function ScrubBackground() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const progress = useRef(0);
   const [fallback, setFallback] = useState(false);
+  // Mobile: play the video as a normal autoplay/loop background instead of the
+  // scroll-scrub. Plain playback is GPU-composited and cheap (no per-frame
+  // seek/decode), so the video is visible AND scrolling stays smooth on phones.
+  const [mobile, setMobile] = useState(false);
   // Pick source resolution by device pixels (screen width × DPR) so large /
   // high-DPI displays — and fullscreen on 4K — get the 4K source and stay
   // crisp, while phones/standard laptops load the lighter 1440p file. Decided
@@ -47,14 +52,19 @@ export default function ScrubBackground() {
     // tabs and may never fire, leaving the hero uninitialized).
     queueMicrotask(async () => {
       if (aborted) return;
-      // Touch devices / data-saver: scrubbing decodes a video frame on every
-      // scroll tick — far too heavy for phones and the main cause of scroll
-      // jank there. Fall back to the static backdrop instead of the scrub.
-      const coarse = window.matchMedia?.("(pointer: coarse)").matches;
+      // Data-saver: no video at all, just the static backdrop.
       const lowData = window.matchMedia?.("(prefers-reduced-data: reduce)").matches;
-      const small = window.innerWidth < 768;
-      if (coarse || lowData || small) {
+      if (lowData) {
         setFallback(true);
+        return;
+      }
+      // Touch / small screens: per-scroll-frame seeking is far too heavy and
+      // is the main cause of mobile scroll jank. Use a plain autoplay/loop
+      // video instead — visible, moving, and cheap to composite.
+      const coarse = window.matchMedia?.("(pointer: coarse)").matches;
+      const small = window.innerWidth < 768;
+      if (coarse || small) {
+        setMobile(true);
         return;
       }
       const dpr = window.devicePixelRatio || 1;
@@ -207,15 +217,21 @@ export default function ScrubBackground() {
     };
   }, [smooth, src]);
 
-  // Static backdrop: used on touch/data-saver devices (scrub disabled for
-  // perf) and if the video fails to decode. Static (no looping animation) so
-  // it adds zero per-frame work while scrolling.
+  // Static backdrop: data-saver, or if the video fails to decode. Static (no
+  // looping animation) so it adds zero per-frame work while scrolling.
   if (fallback) {
     return (
       <div className="fixed inset-0 z-0 h-screen w-full overflow-hidden bg-obsidian">
         <FallbackBackdrop animate={false} />
       </div>
     );
+  }
+
+  // Mobile: Apple-style scroll-scrub via a decoded image sequence (no video
+  // seeking, which is janky on phones and needs HTTP Range). Scroll-driven,
+  // high quality, smooth.
+  if (mobile) {
+    return <FrameScrub />;
   }
 
   return (
