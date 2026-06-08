@@ -94,9 +94,9 @@ export default function RootLayout({
     <html
       lang="he"
       dir="rtl"
-      className={`${frank.variable} ${assistant.variable} ${cormorant.variable} ${heebo.variable} h-full antialiased`}
+      className={`${frank.variable} ${assistant.variable} ${cormorant.variable} ${heebo.variable} antialiased`}
     >
-      <body className="min-h-full bg-obsidian text-ink">{children}</body>
+      <body className="min-h-screen bg-obsidian text-ink">{children}</body>
     </html>
   );
 }

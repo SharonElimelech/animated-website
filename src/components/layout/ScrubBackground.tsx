@@ -6,12 +6,15 @@ import { motion, useScroll, useSpring, useMotionValueEvent } from "framer-motion
 /**
  * Apple-style canvas-video scrubbing — scroll-tied, smooth, bright, sharp.
  *
- *  - A hidden <video> (all-keyframe, so seeks are instant) is seeked by scroll
- *    progress; each decoded frame is painted to a full-screen <canvas>.
+ *  - A 1440p all-keyframe <video> (so seeks are instant) is seeked by scroll
+ *    progress; each decoded frame is painted to a full-screen <canvas>. The
+ *    video itself is kept invisible behind the canvas (NOT display:none, which
+ *    iOS Safari refuses to decode).
  *  - High-DPI: backing store = CSS size × devicePixelRatio + ctx.scale(dpr) so
- *    frames render crisply at native screen density (no softness).
- *  - NO dimming overlay — the background stays fully bright. Text legibility is
- *    handled by the deep glass bubble in the Hero.
+ *    frames render crisply at native screen density (sharp when fullscreen).
+ *  - This is core hero content, so it renders regardless of "reduce motion";
+ *    the scrub is scroll-driven (user-controlled), not auto-playing. Only
+ *    decorative entrance/parallax effects respect reduce-motion elsewhere.
  *  - Zero React state on scroll: progress lives in a ref (useMotionValueEvent);
  *    an rAF loop draws imperatively. Seeks gated on `seeked` + frame-snapped.
  */
@@ -111,7 +114,8 @@ export default function ScrubBackground() {
     }
 
     const tick = (now: number) => {
-      if (ready && duration > 0) {
+      // Skip all decode/seek work while the tab is hidden (saves battery/CPU).
+      if (ready && duration > 0 && !document.hidden) {
         if (seeking && now - seekStartedAt > SEEK_TIMEOUT) seeking = false;
         if (!seeking) {
           const target = progress.current * duration;
@@ -143,38 +147,45 @@ export default function ScrubBackground() {
     };
   }, [smooth]);
 
+  // Only fall back to the static backdrop if the video itself fails to decode.
+  if (fallback) {
+    return (
+      <div className="fixed inset-0 z-0 h-screen w-full overflow-hidden bg-obsidian">
+        <FallbackBackdrop />
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 z-0 h-screen w-full overflow-hidden bg-obsidian">
-      {!fallback ? (
-        <canvas ref={canvasRef} className="block h-full w-full" />
-      ) : (
-        <FallbackBackdrop />
-      )}
+      <canvas ref={canvasRef} className="relative z-10 block h-full w-full" />
 
-      {/* Hidden source video — decoded for canvas, never composited */}
+      {/* Source video — decoded for the canvas, kept invisible BEHIND it.
+          Not `display:none`: iOS Safari refuses to decode/seek hidden video,
+          which would leave the canvas blank on iPhone. */}
       <video
         ref={videoRef}
-        src="/hero-video.mp4"
+        src="/hero-video-1440.mp4"
         muted
         playsInline
         preload="auto"
         aria-hidden
         tabIndex={-1}
-        style={{ display: "none" }}
+        className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-0"
       />
     </div>
   );
 }
 
-function FallbackBackdrop() {
+function FallbackBackdrop({ animate = true }: { animate?: boolean }) {
   return (
     <div className="grain relative h-full w-full bg-obsidian">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(212,175,55,0.16),transparent_55%)]" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_75%_80%,rgba(138,106,53,0.18),transparent_55%)]" />
       <motion.div
         aria-hidden
-        animate={{ opacity: [0.35, 0.6, 0.35], scale: [1, 1.04, 1] }}
-        transition={{ duration: 9, repeat: Infinity, ease: "easeInOut" }}
+        animate={animate ? { opacity: [0.35, 0.6, 0.35], scale: [1, 1.04, 1] } : undefined}
+        transition={animate ? { duration: 9, repeat: Infinity, ease: "easeInOut" } : undefined}
         className="absolute left-1/2 top-1/2 h-[60vmin] w-[60vmin] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[conic-gradient(from_180deg,transparent,rgba(212,175,55,0.12),transparent)] blur-3xl"
       />
     </div>
