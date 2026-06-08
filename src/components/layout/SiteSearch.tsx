@@ -26,14 +26,22 @@ export default function SiteSearch() {
   const [q, setQ] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
+  const close = () => {
+    setOpen(false);
+    setQ("");
+  };
+
   // Cmd/Ctrl+K to open, Esc to close
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
-        setOpen((v) => !v);
+        setOpen((v) => {
+          if (v) setQ("");
+          return !v;
+        });
       }
-      if (e.key === "Escape") setOpen(false);
+      if (e.key === "Escape") close();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -41,7 +49,6 @@ export default function SiteSearch() {
 
   useEffect(() => {
     if (open) setTimeout(() => inputRef.current?.focus(), 50);
-    else setQ("");
   }, [open]);
 
   const results = useMemo(() => {
@@ -53,7 +60,7 @@ export default function SiteSearch() {
   }, [q]);
 
   const go = (href: string) => {
-    setOpen(false);
+    close();
     const el = document.querySelector(href);
     if (el) el.scrollIntoView({ behavior: "smooth" });
   };
@@ -74,7 +81,7 @@ export default function SiteSearch() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={() => setOpen(false)}
+            onClick={close}
             className="fixed inset-0 z-[70] flex items-start justify-center bg-black/70 px-4 pt-28 backdrop-blur-sm"
           >
             <motion.div
@@ -99,7 +106,7 @@ export default function SiteSearch() {
                   className="w-full bg-transparent text-ink outline-none placeholder:text-muted"
                 />
                 <button
-                  onClick={() => setOpen(false)}
+                  onClick={close}
                   aria-label={t("סגירה", "Close")}
                   className="text-muted transition-colors hover:text-ink"
                 >

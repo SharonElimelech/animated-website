@@ -3,7 +3,7 @@
 import { useRef, useState } from "react";
 import { motion, useScroll, useTransform, type Variants } from "framer-motion";
 import { Scale, ShieldCheck, Award, Phone } from "lucide-react";
-import { whatsappLink, telLink, SITE } from "@/lib/site";
+import { telLink, SITE } from "@/lib/site";
 import { useI18n } from "@/lib/i18n";
 
 const EASE = [0.22, 1, 0.36, 1] as const;

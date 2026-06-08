@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
-import { useI18n } from "@/lib/i18n";
+import { useI18n, type Lang } from "@/lib/i18n";
 import SiteSearch from "./SiteSearch";
 
 const LINKS = [
@@ -15,19 +15,8 @@ const LINKS = [
   { he: "צור קשר", en: "Contact", href: "#contact" },
 ];
 
-export default function Navbar() {
-  const { t, lang, setLang } = useI18n();
-  const [scrolled, setScrolled] = useState(false);
-  const [open, setOpen] = useState(false);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 40);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  const LangSwitch = () => (
+function LangSwitch({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => void }) {
+  return (
     <span className="text-shadow-lux text-sm font-light tracking-wide">
       <button
         onClick={() => setLang("he")}
@@ -44,6 +33,19 @@ export default function Navbar() {
       </button>
     </span>
   );
+}
+
+export default function Navbar() {
+  const { t, lang, setLang } = useI18n();
+  const [scrolled, setScrolled] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return (
     <motion.header
@@ -87,7 +89,7 @@ export default function Navbar() {
         {/* End side: search + language switcher */}
         <div className="hidden items-center gap-5 lg:flex">
           <SiteSearch />
-          <LangSwitch />
+          <LangSwitch lang={lang} setLang={setLang} />
         </div>
 
         {/* Mobile toggle */}
@@ -121,7 +123,7 @@ export default function Navbar() {
             ))}
             <li className="mt-2 flex items-center justify-between border-t border-line pt-3">
               <SiteSearch />
-              <LangSwitch />
+              <LangSwitch lang={lang} setLang={setLang} />
             </li>
           </ul>
         </motion.div>
@@ -129,3 +131,4 @@ export default function Navbar() {
     </motion.header>
   );
 }
+

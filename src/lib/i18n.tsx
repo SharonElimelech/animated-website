@@ -22,13 +22,14 @@ type Ctx = {
 const LanguageContext = createContext<Ctx | null>(null);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLang] = useState<Lang>("he");
-
-  // Load saved preference on mount
-  useEffect(() => {
-    const saved = localStorage.getItem("lang");
-    if (saved === "he" || saved === "en") setLang(saved);
-  }, []);
+  const [lang, setLang] = useState<Lang>(() => {
+    // Read saved preference on first render (client-only)
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("lang");
+      if (saved === "he" || saved === "en") return saved;
+    }
+    return "he";
+  });
 
   // Reflect language on <html> (lang + dir) and persist
   useEffect(() => {

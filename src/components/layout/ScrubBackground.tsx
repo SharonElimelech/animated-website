@@ -141,7 +141,7 @@ export default function ScrubBackground() {
       video.removeEventListener("loadeddata", onReady);
       video.removeEventListener("canplay", onReady);
     };
-  }, []);
+  }, [smooth]);
 
   return (
     <div className="fixed inset-0 z-0 h-screen w-full overflow-hidden bg-obsidian">
