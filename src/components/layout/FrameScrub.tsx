@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { useScroll, useSpring, useMotionValueEvent } from "framer-motion";
+import { useScroll, useMotionValueEvent } from "framer-motion";
 
 /**
  * Apple-style scroll-scrub for mobile (and any device): a decoded image
@@ -23,18 +23,16 @@ const framePath = (i: number) =>
 
 export default function FrameScrub() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const progress = useRef(0);
+  // target = raw scroll position (0..1); framePos = the eased value that chases
+  // it. We lerp framePos toward target every animation frame instead of binding
+  // the frame index straight to scroll, so the timeline catches up smoothly and
+  // never ping-pongs between two frames when scrolling slowly.
+  const target = useRef(0);
+  const framePos = useRef(0);
 
   const { scrollYProgress } = useScroll();
-  // Tight spring → the frame tracks the scroll position closely (smooth, no lag).
-  const smooth = useSpring(scrollYProgress, {
-    stiffness: 140,
-    damping: 34,
-    mass: 0.3,
-    restDelta: 0.0005,
-  });
-  useMotionValueEvent(smooth, "change", (v) => {
-    progress.current = v;
+  useMotionValueEvent(scrollYProgress, "change", (v) => {
+    target.current = v;
   });
 
   useEffect(() => {
@@ -45,7 +43,7 @@ export default function FrameScrub() {
 
     const images: HTMLImageElement[] = new Array(FRAME_COUNT);
     const loaded: boolean[] = new Array(FRAME_COUNT).fill(false);
-    let lastDrawn = -1;
+    let forceRepaint = true;
     let rafId = 0;
     let disposed = false;
 
@@ -61,46 +59,78 @@ export default function FrameScrub() {
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.imageSmoothingEnabled = true;
       ctx.imageSmoothingQuality = "high";
-      lastDrawn = -1; // force a repaint at the new size
+      forceRepaint = true; // repaint at the new size
     };
 
-    // object-fit: cover, drawn in CSS pixels (ctx pre-scaled by DPR).
-    const drawFrame = (idx: number) => {
+    // Paint one frame, object-fit: cover, in CSS pixels (ctx pre-scaled by DPR).
+    const paint = (idx: number, alpha: number) => {
       const img = images[idx];
-      if (!img || !loaded[idx]) return;
+      if (!img || !loaded[idx]) return false;
       const vw = img.naturalWidth;
       const vh = img.naturalHeight;
-      if (!vw || !vh) return;
+      if (!vw || !vh) return false;
       const cssW = window.innerWidth;
       const cssH = window.innerHeight;
       const scale = Math.max(cssW / vw, cssH / vh);
       const dw = vw * scale;
       const dh = vh * scale;
+      ctx.globalAlpha = alpha;
       ctx.drawImage(img, (cssW - dw) / 2, (cssH - dh) / 2, dw, dh);
-      lastDrawn = idx;
+      ctx.globalAlpha = 1;
+      return true;
     };
 
-    // Nearest loaded frame at or below idx, so we never show a blank gap while
-    // later frames are still downloading.
+    // Nearest loaded frame to idx, so we never show a blank gap while later
+    // frames are still downloading.
     const nearestLoaded = (idx: number) => {
       for (let i = idx; i >= 0; i--) if (loaded[i]) return i;
       for (let i = idx + 1; i < FRAME_COUNT; i++) if (loaded[i]) return i;
       return -1;
     };
 
+    // Crossfade the two frames bracketing the continuous position. With only
+    // 145 discrete frames, rounding to one image makes slow scrolling step;
+    // blending the next frame in by the fractional part dissolves between them
+    // so the motion stays smooth at any scroll speed.
+    const render = (pos: number) => {
+      const lo = Math.min(Math.max(Math.floor(pos), 0), last);
+      const hi = Math.min(lo + 1, last);
+      const frac = pos - lo;
+      const base = loaded[lo] ? lo : nearestLoaded(lo);
+      if (base < 0) return;
+      paint(base, 1);
+      if (hi !== lo && frac > 0.001 && loaded[hi]) paint(hi, frac);
+    };
+
+    // Lerp factor: higher = snappier, lower = smoother/longer catch-up.
+    const LERP = 0.15;
+    const last = FRAME_COUNT - 1;
+    let lastPos = -1;
+
     const tick = () => {
       if (!document.hidden) {
-        const target = Math.round(progress.current * (FRAME_COUNT - 1));
-        const idx = Math.min(Math.max(target, 0), FRAME_COUNT - 1);
-        if (idx !== lastDrawn) {
-          const draw = loaded[idx] ? idx : nearestLoaded(idx);
-          if (draw >= 0) drawFrame(draw);
+        const want = target.current * last;
+        // Ease framePos toward the target scroll position.
+        framePos.current += (want - framePos.current) * LERP;
+        // Snap when close enough so it settles cleanly.
+        if (Math.abs(want - framePos.current) < 0.001) framePos.current = want;
+
+        const pos = framePos.current;
+        // Repaint whenever the position moved enough to change the blend, or
+        // when a force-repaint was requested (resize / newly loaded frame).
+        if (forceRepaint || Math.abs(pos - lastPos) > 0.002) {
+          render(pos);
+          lastPos = pos;
+          forceRepaint = false;
         }
       }
       rafId = requestAnimationFrame(tick);
     };
 
     setup();
+    // Seed positions from the current scroll so the first paint is correct.
+    target.current = scrollYProgress.get();
+    framePos.current = target.current * (FRAME_COUNT - 1);
     // Load every frame. The first frame is prioritized so something paints ASAP.
     for (let i = 0; i < FRAME_COUNT; i++) {
       const img = new Image();
@@ -108,10 +138,8 @@ export default function FrameScrub() {
       img.onload = () => {
         loaded[i] = true;
         if (disposed) return;
-        // Repaint if this is the frame we currently want (or the first paint).
-        if (lastDrawn === -1 || i === Math.round(progress.current * (FRAME_COUNT - 1))) {
-          lastDrawn = -1;
-        }
+        // Repaint if this frame is at or next to the one currently showing.
+        if (Math.abs(i - framePos.current) <= 1) forceRepaint = true;
       };
       img.src = framePath(i);
       images[i] = img;
@@ -127,7 +155,7 @@ export default function FrameScrub() {
       window.removeEventListener("resize", setup);
       document.removeEventListener("fullscreenchange", setup);
     };
-  }, []);
+  }, [scrollYProgress]);
 
   return (
     <div className="fixed inset-0 z-0 h-screen w-full overflow-hidden bg-obsidian">

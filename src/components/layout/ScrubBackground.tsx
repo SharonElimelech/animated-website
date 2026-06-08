@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useScroll, useSpring, useMotionValueEvent } from "framer-motion";
+import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import FrameScrub from "./FrameScrub";
 
 /**
@@ -89,16 +89,12 @@ export default function ScrubBackground() {
   }, []);
 
   const { scrollYProgress } = useScroll();
-  // Tighter spring → the scrubbed frame tracks the scroll position closely
-  // instead of lagging behind, which reads as smoother scrolling.
-  const smooth = useSpring(scrollYProgress, {
-    stiffness: 140,
-    damping: 34,
-    mass: 0.3,
-    restDelta: 0.0005,
-  });
-  useMotionValueEvent(smooth, "change", (v) => {
-    progress.current = v;
+  // target = raw scroll (0..1). progress.current is lerped toward it in the rAF
+  // loop below, so the scrubbed frame eases to the scroll position and never
+  // jitters between adjacent frames at slow scroll speeds.
+  const target = useRef(0);
+  useMotionValueEvent(scrollYProgress, "change", (v) => {
+    target.current = v;
   });
 
   useEffect(() => {
@@ -107,6 +103,10 @@ export default function ScrubBackground() {
     if (!video || !canvas) return;
     const ctx = canvas.getContext("2d", { alpha: false });
     if (!ctx) return;
+
+    // Seed from current scroll so a mid-page refresh starts on the right frame.
+    target.current = scrollYProgress.get();
+    progress.current = target.current;
 
     let rafId = 0;
     let rvfcId = 0;
@@ -179,13 +179,19 @@ export default function ScrubBackground() {
       p.then(() => video.pause()).catch(() => {});
     }
 
+    const LERP = 0.15;
     const tick = (now: number) => {
+      // Ease the scrubbed position toward the raw scroll target so the frame
+      // catches up smoothly instead of jumping rigidly at slow scroll speeds.
+      progress.current += (target.current - progress.current) * LERP;
+      if (Math.abs(target.current - progress.current) < 0.0005)
+        progress.current = target.current;
       // Skip all decode/seek work while the tab is hidden (saves battery/CPU).
       if (ready && duration > 0 && !document.hidden) {
         if (seeking && now - seekStartedAt > SEEK_TIMEOUT) seeking = false;
         if (!seeking) {
-          const target = progress.current * duration;
-          const snapped = Math.round(target / FRAME) * FRAME;
+          const targetTime = progress.current * duration;
+          const snapped = Math.round(targetTime / FRAME) * FRAME;
           if (Math.abs(video.currentTime - snapped) > FRAME / 2) {
             seeking = true;
             seekStartedAt = now;
@@ -215,7 +221,7 @@ export default function ScrubBackground() {
       video.removeEventListener("loadeddata", onReady);
       video.removeEventListener("canplay", onReady);
     };
-  }, [smooth, src]);
+  }, [src, scrollYProgress]);
 
   // Static backdrop: data-saver, or if the video fails to decode. Static (no
   // looping animation) so it adds zero per-frame work while scrolling.
