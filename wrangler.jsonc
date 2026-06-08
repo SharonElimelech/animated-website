@@ -2,6 +2,7 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"main": ".open-next/worker.js",
 	"name": "hadar-new-website",
+	"pages_build_output_dir": ".worker-next/assets",
 	"compatibility_date": "2026-06-08",
 	"compatibility_flags": [
 		"nodejs_compat",
