@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(claude mcp *)",
+      "Bash(node -e \"try{const c=require\\(process.env.USERPROFILE+'/.claude.json'\\);console.log\\('mcpServers keys:',Object.keys\\(c.mcpServers||{}\\)\\);}catch\\(e\\){console.log\\(e.message\\)}\")",
+      "Bash(npm --version)",
+      "Bash(npx --version)",
+      "Bash(npx --yes create-next-app@latest . --ts --app --tailwind --eslint --src-dir --import-alias \"@/*\" --use-npm --no-turbopack --yes)",
+      "Read(//c/Users/שרון אלימלך/Desktop/**)",
+      "Bash(npx --yes create-next-app@latest hadar-scaffold-tmp --ts --app --tailwind --eslint --src-dir --import-alias \"@/*\" --use-npm --no-turbopack --yes)",
+      "Bash(rm -rf \"../hadar-scaffold-tmp\" && echo \"temp removed\"; echo \"---current package.json---\"; cat package.json)",
+      "Bash(npm install *)",
+      "Bash(npm ls *)"
+    ]
+  }
+}
