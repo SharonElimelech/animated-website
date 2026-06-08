@@ -6,12 +6,15 @@ import { motion, useScroll, useSpring, useMotionValueEvent } from "framer-motion
 /**
  * Apple-style canvas-video scrubbing — scroll-tied, smooth, bright, sharp.
  *
- *  - A 1440p all-keyframe <video> (so seeks are instant) is seeked by scroll
+ *  - An all-keyframe <video> (so seeks are instant) is seeked by scroll
  *    progress; each decoded frame is painted to a full-screen <canvas>. The
  *    video itself is kept invisible behind the canvas (NOT display:none, which
  *    iOS Safari refuses to decode).
+ *  - Resolution is adaptive: large / high-DPI screens (incl. fullscreen on 4K)
+ *    load a 4K source and stay crisp; phones/laptops get the lighter 1440p one.
  *  - High-DPI: backing store = CSS size × devicePixelRatio + ctx.scale(dpr) so
- *    frames render crisply at native screen density (sharp when fullscreen).
+ *    frames render crisply at native screen density. Canvas is re-sized on both
+ *    `resize` and `fullscreenchange` so entering fullscreen stays sharp.
  *  - This is core hero content, so it renders regardless of "reduce motion";
  *    the scrub is scroll-driven (user-controlled), not auto-playing. Only
  *    decorative entrance/parallax effects respect reduce-motion elsewhere.
@@ -23,6 +26,16 @@ export default function ScrubBackground() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const progress = useRef(0);
   const [fallback, setFallback] = useState(false);
+  // Pick source resolution by device pixels (screen width × DPR) so large /
+  // high-DPI displays — and fullscreen on 4K — get the 4K source and stay
+  // crisp, while phones/standard laptops load the lighter 1440p file. Decided
+  // on the client (after mount) to match the actual device.
+  const [src, setSrc] = useState<string | null>(null);
+  useEffect(() => {
+    const dpr = window.devicePixelRatio || 1;
+    const deviceW = (window.screen?.width || window.innerWidth) * dpr;
+    setSrc(deviceW >= 2560 ? "/hero-video-4k.mp4" : "/hero-video-1440.mp4");
+  }, []);
 
   const { scrollYProgress } = useScroll();
   const smooth = useSpring(scrollYProgress, {
@@ -135,17 +148,21 @@ export default function ScrubBackground() {
     };
     rafId = requestAnimationFrame(tick);
     window.addEventListener("resize", setup);
+    // Entering/leaving fullscreen changes the viewport — rebuild the backing
+    // store at the new size so the frame stays crisp instead of upscaled.
+    document.addEventListener("fullscreenchange", setup);
 
     return () => {
       cancelAnimationFrame(rafId);
       if (hasRVFC && rvfcId) video.cancelVideoFrameCallback?.(rvfcId);
       window.removeEventListener("resize", setup);
+      document.removeEventListener("fullscreenchange", setup);
       video.removeEventListener("loadedmetadata", onMeta);
       video.removeEventListener("seeked", onSeeked);
       video.removeEventListener("loadeddata", onReady);
       video.removeEventListener("canplay", onReady);
     };
-  }, [smooth]);
+  }, [smooth, src]);
 
   // Only fall back to the static backdrop if the video itself fails to decode.
   if (fallback) {
@@ -162,17 +179,20 @@ export default function ScrubBackground() {
 
       {/* Source video — decoded for the canvas, kept invisible BEHIND it.
           Not `display:none`: iOS Safari refuses to decode/seek hidden video,
-          which would leave the canvas blank on iPhone. */}
-      <video
-        ref={videoRef}
-        src="/hero-video-1440.mp4"
-        muted
-        playsInline
-        preload="auto"
-        aria-hidden
-        tabIndex={-1}
-        className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-0"
-      />
+          which would leave the canvas blank on iPhone. `src` is resolution-
+          adaptive and chosen on the client, so only render once decided. */}
+      {src && (
+        <video
+          ref={videoRef}
+          src={src}
+          muted
+          playsInline
+          preload="auto"
+          aria-hidden
+          tabIndex={-1}
+          className="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-0"
+        />
+      )}
     </div>
   );
 }
