@@ -30,19 +30,62 @@ export default function ScrubBackground() {
   // high-DPI displays — and fullscreen on 4K — get the 4K source and stay
   // crisp, while phones/standard laptops load the lighter 1440p file. Decided
   // on the client (after mount) to match the actual device.
+  //
+  // The video is fetched as a Blob and played from an object URL instead of a
+  // plain path. Frame-accurate scroll-scrubbing relies on seeking
+  // (video.currentTime = t), which requires HTTP Range support. Cloudflare's
+  // static-asset server returns the whole file (200, no Accept-Ranges), so a
+  // direct <video src="/…mp4"> cannot seek and the scrub never advances.
+  // A blob: URL is fully in-memory and seekable everywhere.
   const [src, setSrc] = useState<string | null>(null);
   useEffect(() => {
-    const dpr = window.devicePixelRatio || 1;
-    const deviceW = (window.screen?.width || window.innerWidth) * dpr;
-    setSrc(deviceW >= 2560 ? "/hero-video-4k.mp4" : "/hero-video-1440.mp4");
+    let objectUrl: string | null = null;
+    let aborted = false;
+    const ctrl = new AbortController();
+    // Deferred to a microtask so this isn't a synchronous setState during
+    // commit, while still running reliably (rAF is throttled in background
+    // tabs and may never fire, leaving the hero uninitialized).
+    queueMicrotask(async () => {
+      if (aborted) return;
+      // Touch devices / data-saver: scrubbing decodes a video frame on every
+      // scroll tick — far too heavy for phones and the main cause of scroll
+      // jank there. Fall back to the static backdrop instead of the scrub.
+      const coarse = window.matchMedia?.("(pointer: coarse)").matches;
+      const lowData = window.matchMedia?.("(prefers-reduced-data: reduce)").matches;
+      const small = window.innerWidth < 768;
+      if (coarse || lowData || small) {
+        setFallback(true);
+        return;
+      }
+      const dpr = window.devicePixelRatio || 1;
+      const deviceW = (window.screen?.width || window.innerWidth) * dpr;
+      const path = deviceW >= 2560 ? "/hero-video-4k.mp4" : "/hero-video-1440.mp4";
+      try {
+        const res = await fetch(path, { signal: ctrl.signal });
+        if (!res.ok) throw new Error(`video fetch ${res.status}`);
+        const blob = await res.blob();
+        if (aborted) return;
+        objectUrl = URL.createObjectURL(blob);
+        setSrc(objectUrl);
+      } catch {
+        if (!aborted) setFallback(true);
+      }
+    });
+    return () => {
+      aborted = true;
+      ctrl.abort();
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
   }, []);
 
   const { scrollYProgress } = useScroll();
+  // Tighter spring → the scrubbed frame tracks the scroll position closely
+  // instead of lagging behind, which reads as smoother scrolling.
   const smooth = useSpring(scrollYProgress, {
-    stiffness: 90,
-    damping: 28,
-    mass: 0.4,
-    restDelta: 0.0001,
+    stiffness: 140,
+    damping: 34,
+    mass: 0.3,
+    restDelta: 0.0005,
   });
   useMotionValueEvent(smooth, "change", (v) => {
     progress.current = v;
@@ -164,11 +207,13 @@ export default function ScrubBackground() {
     };
   }, [smooth, src]);
 
-  // Only fall back to the static backdrop if the video itself fails to decode.
+  // Static backdrop: used on touch/data-saver devices (scrub disabled for
+  // perf) and if the video fails to decode. Static (no looping animation) so
+  // it adds zero per-frame work while scrolling.
   if (fallback) {
     return (
       <div className="fixed inset-0 z-0 h-screen w-full overflow-hidden bg-obsidian">
-        <FallbackBackdrop />
+        <FallbackBackdrop animate={false} />
       </div>
     );
   }
@@ -179,8 +224,9 @@ export default function ScrubBackground() {
 
       {/* Source video — decoded for the canvas, kept invisible BEHIND it.
           Not `display:none`: iOS Safari refuses to decode/seek hidden video,
-          which would leave the canvas blank on iPhone. `src` is resolution-
-          adaptive and chosen on the client, so only render once decided. */}
+          which would leave the canvas blank on iPhone. `src` is a blob: URL
+          (resolution-adaptive, fetched on the client), so only render once
+          the blob is ready. */}
       {src && (
         <video
           ref={videoRef}

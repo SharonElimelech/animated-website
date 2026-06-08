@@ -3,7 +3,9 @@ export default function GrainOverlay() {
   return (
     <div
       aria-hidden
-      className="film-grain pointer-events-none fixed inset-0 z-[100] opacity-[0.04]"
+      // transform-gpu promotes this full-screen texture to its own compositor
+      // layer so it doesn't repaint the page on every scroll frame.
+      className="film-grain pointer-events-none fixed inset-0 z-[100] transform-gpu opacity-[0.04] [contain:strict]"
     />
   );
 }
