@@ -36,15 +36,14 @@ export default function MasterHero() {
             alt=""
             aria-hidden
             onError={() => setImgOk(false)}
-            className="h-full w-full object-cover object-center grayscale-[0.15]"
+            className="h-full w-full object-cover object-center"
           />
         ) : (
           <Fallback />
         )}
-        {/* darken the text side + warm gold glow on the other */}
-        <div aria-hidden className="absolute inset-0 bg-gradient-to-l from-obsidian via-obsidian/45 to-transparent rtl:bg-gradient-to-l ltr:bg-gradient-to-r" />
-        <div aria-hidden className="absolute inset-0 bg-[radial-gradient(circle_at_15%_45%,rgba(212,175,55,0.22),transparent_48%)]" />
-        <div aria-hidden className="absolute inset-0 bg-obsidian/20" />
+        {/* Lighter scrim — only enough on the text side for legibility */}
+        <div aria-hidden className="absolute inset-0 rtl:bg-gradient-to-l ltr:bg-gradient-to-r from-obsidian/80 via-obsidian/15 to-transparent" />
+        <div aria-hidden className="absolute inset-0 bg-[radial-gradient(circle_at_15%_45%,rgba(212,175,55,0.18),transparent_52%)]" />
       </motion.div>
 
       {/* Content — start side (right in RTL, left in LTR) */}
