@@ -6,10 +6,10 @@ export const SITE = {
   phone: "052-4925422",
   phoneIntl: "972524925422", // for tel:/wa.me links
   address: "האורגים 11, אשדוד",
-  // TODO: replace with the firm's real profile URLs
   social: {
-    facebook: "#",
-    instagram: "#",
+    facebook: "https://www.facebook.com/profile.php?id=61586870195547",
+    instagram: "https://www.instagram.com/hadar_elimelech_adv/",
+    tiktok: "https://www.tiktok.com/@hadarelimelechlaw",
   },
 } as const;
 
