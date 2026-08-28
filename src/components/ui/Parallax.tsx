@@ -21,6 +21,10 @@ export default function Parallax({
   const yRaw = useTransform(scrollYProgress, [0, 1], [distance, -distance]);
   const y = useSpring(yRaw, { stiffness: 120, damping: 30, mass: 0.4 });
 
+  // No reduced-motion branch here: the root <MotionConfig reducedMotion="user">
+  // already neutralizes this transform for those users. Always rendering the
+  // same motion.div keeps SSR and the first client render identical, avoiding
+  // a hydration mismatch (useReducedMotion() is null on the server).
   return (
     <motion.div
       ref={ref}

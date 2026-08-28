@@ -38,15 +38,20 @@
     background-color: var(--color-obsidian);
     /* offset anchored sections below the fixed navbar */
     scroll-padding-top: 6.5rem;
+    /* Kill any horizontal swipe/scroll on mobile */
+    overflow-x: hidden;
+    max-width: 100%;
   }
 
   body {
+    position: relative;
     background-color: var(--color-obsidian);
     color: var(--color-ink);
     font-family: var(--font-sans), system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
     overflow-x: hidden;
+    max-width: 100%;
   }
 
   h1, h2, h3, h4, h5, h6 {

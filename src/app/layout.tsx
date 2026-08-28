@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import {
   Frank_Ruhl_Libre,
   Assistant,
@@ -43,6 +43,13 @@ const TITLE = "הדר אלימלך - משרד עורכי דין | חדלות פ�
 const DESCRIPTION =
   "אסטרטגיה אישית וממוקדת תוצאות להחזרת השליטה הפיננסית שלך. מנהיגות משפטית בחדלות פירעון, הסדרי חובות מורכבים ופירוק חברות.";
 const SITE_URL = "https://hadar-elimelech.co.il";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#050505",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -94,9 +101,9 @@ export default function RootLayout({
     <html
       lang="he"
       dir="rtl"
-      className={`${frank.variable} ${assistant.variable} ${cormorant.variable} ${heebo.variable} h-full antialiased`}
+      className={`${frank.variable} ${assistant.variable} ${cormorant.variable} ${heebo.variable} antialiased`}
     >
-      <body className="min-h-full bg-obsidian text-ink">{children}</body>
+      <body className="min-h-screen bg-obsidian text-ink">{children}</body>
     </html>
   );
 }

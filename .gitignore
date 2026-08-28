@@ -41,6 +41,10 @@ yarn-error.log*
 .wrangler
 .open-next
 
+# deploy artifacts
+*.zip
+deploy.log
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

@@ -96,7 +96,8 @@ export default function Navbar() {
         <button
           onClick={() => setOpen((v) => !v)}
           aria-label={t("תפריט", "Menu")}
-          className="text-ink lg:hidden"
+          aria-expanded={open}
+          className="-m-2 flex h-11 w-11 items-center justify-center p-2 text-ink lg:hidden"
         >
           {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
