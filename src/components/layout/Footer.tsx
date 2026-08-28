@@ -20,10 +20,10 @@ function InstagramIcon({ className }: { className?: string }) {
 }
 
 const NAV = [
-  { he: "אודות המשרד", en: "About", href: "#about" },
-  { he: "המסלול שלך", en: "Your Process", href: "#process" },
-  { he: "שאלות נפוצות", en: "FAQ", href: "#faq" },
-  { he: "צור קשר", en: "Contact", href: "#contact" },
+  { he: "אודות המשרד", en: "About", href: "/#about" },
+  { he: "המסלול שלך", en: "Your Process", href: "/#process" },
+  { he: "שאלות נפוצות", en: "FAQ", href: "/#faq" },
+  { he: "צור קשר", en: "Contact", href: "/#contact" },
 ];
 
 export default function Footer() {
@@ -97,10 +97,10 @@ export default function Footer() {
             )}
           </p>
           <div className="flex gap-6">
-            <a href="#" className="transition-colors hover:text-gold">
+            <a href="/privacy" className="transition-colors hover:text-gold">
               {t("מדיניות פרטיות", "Privacy Policy")}
             </a>
-            <a href="#" className="transition-colors hover:text-gold">
+            <a href="/accessibility" className="transition-colors hover:text-gold">
               {t("הצהרת נגישות", "Accessibility")}
             </a>
           </div>

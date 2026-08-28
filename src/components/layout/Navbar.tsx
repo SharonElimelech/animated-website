@@ -8,11 +8,11 @@ import { useI18n, type Lang } from "@/lib/i18n";
 import SiteSearch from "./SiteSearch";
 
 const LINKS = [
-  { he: "בית", en: "Home", href: "#home" },
-  { he: "אודות", en: "About", href: "#about" },
-  { he: "מחשבון חובות", en: "Calculator", href: "#calculator" },
-  { he: "המסלול", en: "Process", href: "#process" },
-  { he: "צור קשר", en: "Contact", href: "#contact" },
+  { he: "בית", en: "Home", href: "/#home" },
+  { he: "אודות", en: "About", href: "/#about" },
+  { he: "מחשבון חובות", en: "Calculator", href: "/#calculator" },
+  { he: "המסלול", en: "Process", href: "/#process" },
+  { he: "צור קשר", en: "Contact", href: "/#contact" },
 ];
 
 function LangSwitch({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => void }) {
@@ -60,7 +60,7 @@ export default function Navbar() {
         }`}
       >
         {/* Brand — start side (right in RTL, left in LTR) */}
-        <a href="#home" aria-label={t("הדר אלימלך — דף הבית", "Hadar Elimelech — Home")} className="group flex items-center">
+        <a href="/#home" aria-label={t("הדר אלימלך — דף הבית", "Hadar Elimelech — Home")} className="group flex items-center">
           <Image
             src="/logo-float.png"
             alt={t("הדר אלימלך — משרד עורכי דין", "Hadar Elimelech — Law Office")}

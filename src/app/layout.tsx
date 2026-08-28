@@ -42,7 +42,7 @@ const cormorant = Cormorant_Garamond({
 const TITLE = "הדר אלימלך - משרד עורכי דין | חדלות פירעון ושיקום כלכלי";
 const DESCRIPTION =
   "אסטרטגיה אישית וממוקדת תוצאות להחזרת השליטה הפיננסית שלך. מנהיגות משפטית בחדלות פירעון, הסדרי חובות מורכבים ופירוק חברות.";
-const SITE_URL = "https://hadar-elimelech.co.il";
+const SITE_URL = "https://hadar-elimelech-law.co.il";
 
 export const viewport: Viewport = {
   width: "device-width",
