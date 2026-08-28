@@ -82,7 +82,7 @@ export default function Contact() {
                   {t("כתובת המשרד", "Office address")}
                 </span>
                 <span className="mt-1 block text-base font-bold text-ink">
-                  {t(SITE.address, "Kochav HaShachar 3, Ashdod")}
+                  {t(SITE.address, "HaOrgim 11, Ashdod")}
                 </span>
               </span>
             </div>

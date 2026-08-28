@@ -7,6 +7,12 @@
 		"nodejs_compat",
 		"global_fetch_strictly_public"
 	],
+	// Keep the *.workers.dev URL alive alongside the custom domain.
+	"workers_dev": true,
+	"routes": [
+		{ "pattern": "hadar-elimelech-law.co.il", "custom_domain": true },
+		{ "pattern": "www.hadar-elimelech-law.co.il", "custom_domain": true }
+	],
 	"assets": {
 		"directory": ".open-next/assets",
 		"binding": "ASSETS"
