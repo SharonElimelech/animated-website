@@ -5,7 +5,7 @@ export const SITE = {
   tagline: "LAW FIRM & NOTARY",
   phone: "052-4925422",
   phoneIntl: "972524925422", // for tel:/wa.me links
-  address: "כוכב השחר 3, אשדוד",
+  address: "האורגים 11, אשדוד",
   // TODO: replace with the firm's real profile URLs
   social: {
     facebook: "#",
