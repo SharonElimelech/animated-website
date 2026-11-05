@@ -13,23 +13,28 @@ import { motion, useScroll, useSpring, useMotionValueEvent } from "framer-motion
  *  - A 60% scrim (below) dims the video so text over it stays readable; the
  *    video must stay all-keyframe (ffmpeg -g 1) or scroll-seeks stutter.
  *  - Zero React state on scroll: progress lives in a ref (useMotionValueEvent);
- *    an rAF loop draws imperatively. Seeks gated on `seeked` + frame-snapped.
+ *    an rAF loop draws imperatively, cross-fading the two decoded frames around
+ *    the exact position so slow scrolling stays smooth (one seek in flight).
  */
 export default function ScrubBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const progress = useRef(0);
+  const lastMove = useRef(0); // when progress last changed (ms)
   const [fallback, setFallback] = useState(false);
 
   const { scrollYProgress } = useScroll();
+  // Critically damped and quick (Apple: damping 1.0, response ~0.35s): follows the
+  // scroll smoothly but settles in ~0.5s instead of a long slow-motion tail.
   const smooth = useSpring(scrollYProgress, {
-    stiffness: 90,
-    damping: 28,
-    mass: 0.4,
-    restDelta: 0.0001,
+    stiffness: 300,
+    damping: 35,
+    mass: 1,
+    restDelta: 0.0005,
   });
   useMotionValueEvent(smooth, "change", (v) => {
     progress.current = v;
+    lastMove.current = performance.now();
   });
 
   useEffect(() => {
@@ -39,28 +44,113 @@ export default function ScrubBackground() {
     const ctx = canvas.getContext("2d", { alpha: false });
     if (!ctx) return;
 
-    let rafId = 0;
-    let rvfcId = 0;
-    let seeking = false;
+    // Tunables in one place (scroll-scrubbed-visual-sequence skill).
+    const CFG = {
+      fps: 24, // source frame rate
+      maxCache: 6, // decoded frames kept around (≈8MB each at 1080p)
+      seekTimeoutMs: 400, // give up on a stuck seek
+      reducedMotionFrame: 0.5, // static frame (fraction of the video) under reduced motion
+      settleMs: 120, // no movement for this long = scrolling stopped
+      snapRate: 0.25, // per-frame ease toward the nearest single frame once stopped
+      playMinFps: 30, // forward scroll faster than this (frames/s) plays natively
+      maxRate: 4, // playbackRate cap while playing
+      catchUp: 2, // extra rate per second of lag behind the scroll position
+    };
+    let playing = false;
+    // Wide/high-DPI screens get the 1440p file so the frame isn't upscaled ~1.8x.
+    const physicalWidth = Math.max(window.innerWidth, window.screen.width) * Math.min(window.devicePixelRatio || 1, 2);
+    video.src = physicalWidth > 2200 ? "/hero-video-1440.mp4" : "/hero-video.mp4";
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // Only 145 frames span the whole page (~46px of scroll each), so a slow scroll
+    // used to step like a slideshow. We keep the two frames around the exact scroll
+    // position decoded and cross-fade between them by the fractional position.
+    const cache = new Map<number, ImageBitmap>();
+    let frames = 0;
+    let wantIndex = 0;
+    let seekingFrame = -1;
     let seekStartedAt = 0;
-    let duration = 0;
+    let rafId = 0;
+    let lastKey = "";
     let ready = false;
-    const FRAME = 1 / 24;
-    const SEEK_TIMEOUT = 240;
-    const hasRVFC = "requestVideoFrameCallback" in video;
+    let tShown = 0; // blend factor actually painted
 
     // object-fit: cover, drawn in CSS pixels (ctx pre-scaled by DPR)
-    const draw = () => {
+    const paint = (a: ImageBitmap, b: ImageBitmap | undefined, t: number) => {
+      const cssW = window.innerWidth;
+      const cssH = window.innerHeight;
+      const scale = Math.max(cssW / a.width, cssH / a.height);
+      const dw = a.width * scale;
+      const dh = a.height * scale;
+      const dx = (cssW - dw) / 2;
+      const dy = (cssH - dh) / 2;
+      ctx.globalAlpha = 1;
+      ctx.drawImage(a, dx, dy, dw, dh);
+      if (b && t > 0.002) {
+        ctx.globalAlpha = t;
+        ctx.drawImage(b, dx, dy, dw, dh);
+        ctx.globalAlpha = 1;
+      }
+    };
+    // Live frame while the video plays (fast forward scroll).
+    const paintVideo = () => {
       const vw = video.videoWidth;
       const vh = video.videoHeight;
       if (!vw || !vh) return;
       const cssW = window.innerWidth;
       const cssH = window.innerHeight;
       const scale = Math.max(cssW / vw, cssH / vh);
-      const dw = vw * scale;
-      const dh = vh * scale;
-      ctx.clearRect(0, 0, cssW, cssH);
-      ctx.drawImage(video, (cssW - dw) / 2, (cssH - dh) / 2, dw, dh);
+      ctx.globalAlpha = 1;
+      ctx.drawImage(video, (cssW - vw * scale) / 2, (cssH - vh * scale) / 2, vw * scale, vh * scale);
+    };
+    const draw = () => {
+      lastKey = ""; // force a repaint on the next tick
+    };
+
+    const nearestCached = (i: number) => {
+      let best: ImageBitmap | undefined;
+      let bestD = Infinity;
+      for (const [k, bmp] of cache) {
+        const d = Math.abs(k - i);
+        if (d < bestD) {
+          bestD = d;
+          best = bmp;
+        }
+      }
+      return best;
+    };
+
+    // One seek in flight at a time; never queue every seek during fast scrolling.
+    const requestFrame = (i: number, now: number) => {
+      if (cache.has(i)) return;
+      if (seekingFrame !== -1 && now - seekStartedAt < CFG.seekTimeoutMs) return;
+      seekingFrame = i;
+      seekStartedAt = now;
+      try {
+        video.currentTime = (i + 0.5) / CFG.fps; // middle of frame i
+      } catch {
+        seekingFrame = -1;
+      }
+    };
+
+    const onFrameDecoded = async () => {
+      const i = seekingFrame;
+      if (i < 0) return;
+      try {
+        const bmp = await createImageBitmap(video);
+        cache.get(i)?.close();
+        cache.set(i, bmp);
+        while (cache.size > CFG.maxCache) {
+          let far = -1;
+          for (const k of cache.keys()) if (far < 0 || Math.abs(k - wantIndex) > Math.abs(far - wantIndex)) far = k;
+          cache.get(far)?.close();
+          cache.delete(far);
+        }
+      } catch {
+        // decode failed; the next tick retries
+      }
+      seekingFrame = -1;
+      lastKey = "";
     };
 
     // High-DPI setup: CSS size standard, backing store = css × DPR
@@ -78,22 +168,16 @@ export default function ScrubBackground() {
       draw();
     };
 
-    const onFrame = () => {
-      draw();
-      if (hasRVFC) rvfcId = video.requestVideoFrameCallback(onFrame);
-    };
     const onMeta = () => {
-      duration = video.duration || 0;
+      frames = Math.max(1, Math.round((video.duration || 0) * CFG.fps));
     };
     const onSeeked = () => {
-      seeking = false;
-      if (!hasRVFC) draw();
+      void onFrameDecoded();
     };
     const onReady = () => {
       if (ready) return;
       ready = true;
       setup();
-      if (hasRVFC) rvfcId = video.requestVideoFrameCallback(onFrame);
     };
 
     video.addEventListener("loadedmetadata", onMeta);
@@ -111,20 +195,59 @@ export default function ScrubBackground() {
     }
 
     const tick = (now: number) => {
-      if (ready && duration > 0) {
-        if (seeking && now - seekStartedAt > SEEK_TIMEOUT) seeking = false;
-        if (!seeking) {
-          const target = progress.current * duration;
-          const snapped = Math.round(target / FRAME) * FRAME;
-          if (Math.abs(video.currentTime - snapped) > FRAME / 2) {
-            seeking = true;
-            seekStartedAt = now;
-            try {
-              video.currentTime = snapped;
-            } catch {
-              seeking = false;
-            }
+      // Pause work while the tab is hidden.
+      if (ready && frames > 0 && !document.hidden) {
+        const pos = (reducedMotion ? CFG.reducedMotionFrame : progress.current) * (frames - 1);
+        const f = Math.min(Math.max(pos, 0), frames - 1);
+
+        // Fast forward scroll: play the video natively at a rate matched to the scroll
+        // (as smooth as real video), steering toward the exact position. Slow, reverse
+        // or stopped scrolling falls through to the frame-accurate blend below.
+        const framesPerSec = smooth.getVelocity() * (frames - 1);
+        const lead = (f + 0.5) / CFG.fps - video.currentTime;
+        if (!reducedMotion && framesPerSec > CFG.playMinFps && lead > 0) {
+          video.playbackRate = Math.min(CFG.maxRate, Math.max(0.5, framesPerSec / CFG.fps + lead * CFG.catchUp));
+          if (video.paused) void video.play().catch(() => {});
+          playing = true;
+          if (video.readyState >= 2) paintVideo();
+          lastKey = "";
+          rafId = requestAnimationFrame(tick);
+          return;
+        }
+        if (playing) {
+          video.pause();
+          playing = false;
+          seekingFrame = -1;
+        }
+
+        const i = Math.floor(f);
+        const j = Math.min(i + 1, frames - 1);
+        const raw = reducedMotion ? 0 : f - i;
+        // While scrolling, blend by the exact position (smooth). Once stopped, ease to
+        // the nearest single frame so the resting image is sharp, not a double exposure.
+        const moving = now - lastMove.current < CFG.settleMs;
+        if (moving) tShown = raw;
+        else {
+          const target = raw < 0.5 ? 0 : 1;
+          tShown += (target - tShown) * CFG.snapRate;
+          if (Math.abs(target - tShown) < 0.01) tShown = target;
+        }
+        const t = tShown;
+        wantIndex = i;
+
+        // Decode what the current position needs: frame i first, then i+1.
+        if (!cache.has(i)) requestFrame(i, now);
+        else if (!reducedMotion && !cache.has(j)) requestFrame(j, now);
+
+        const a = cache.get(i);
+        const key = `${i}|${t.toFixed(3)}|${cache.has(i)}|${cache.has(j)}`;
+        if (key !== lastKey) {
+          if (a) paint(a, cache.get(j), t);
+          else {
+            const near = nearestCached(i); // keep something on screen while decoding
+            if (near) paint(near, undefined, 0);
           }
+          lastKey = key;
         }
       }
       rafId = requestAnimationFrame(tick);
@@ -134,12 +257,13 @@ export default function ScrubBackground() {
 
     return () => {
       cancelAnimationFrame(rafId);
-      if (hasRVFC && rvfcId) video.cancelVideoFrameCallback?.(rvfcId);
       window.removeEventListener("resize", setup);
       video.removeEventListener("loadedmetadata", onMeta);
       video.removeEventListener("seeked", onSeeked);
       video.removeEventListener("loadeddata", onReady);
       video.removeEventListener("canplay", onReady);
+      for (const bmp of cache.values()) bmp.close();
+      cache.clear();
     };
   }, [smooth]);
 
@@ -157,7 +281,6 @@ export default function ScrubBackground() {
       {/* Hidden source video — decoded for canvas, never composited */}
       <video
         ref={videoRef}
-        src="/hero-video.mp4"
         muted
         playsInline
         preload="auto"
