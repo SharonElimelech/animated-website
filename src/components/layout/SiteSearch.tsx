@@ -62,7 +62,9 @@ export default function SiteSearch() {
   const go = (href: string) => {
     close();
     const el = document.querySelector(href);
+    // Section not on this page (e.g. an article) → go to it on the home page.
     if (el) el.scrollIntoView({ behavior: "smooth" });
+    else window.location.href = "/" + href;
   };
 
   return (

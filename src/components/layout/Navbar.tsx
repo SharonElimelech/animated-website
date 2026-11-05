@@ -8,11 +8,11 @@ import { useI18n, type Lang } from "@/lib/i18n";
 import SiteSearch from "./SiteSearch";
 
 const LINKS = [
-  { he: "בית", en: "Home", href: "#home" },
-  { he: "אודות", en: "About", href: "#about" },
-  { he: "מחשבון חובות", en: "Calculator", href: "#calculator" },
-  { he: "המסלול", en: "Process", href: "#process" },
-  { he: "צור קשר", en: "Contact", href: "#contact" },
+  { he: "בית", en: "Home", href: "/#home" },
+  { he: "אודות", en: "About", href: "/#about" },
+  { he: "מחשבון חובות", en: "Calculator", href: "/#calculator" },
+  { he: "המסלול", en: "Process", href: "/#process" },
+  { he: "צור קשר", en: "Contact", href: "/#contact" },
 ];
 
 function LangSwitch({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => void }) {
@@ -35,7 +35,10 @@ function LangSwitch({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => void 
   );
 }
 
-export default function Navbar() {
+export default function Navbar({ showArticles = false }: { showArticles?: boolean }) {
+  const links = showArticles
+    ? [...LINKS.slice(0, 4), { he: "מאמרים", en: "Articles", href: "/articles" }, ...LINKS.slice(4)]
+    : LINKS;
   const { t, lang, setLang } = useI18n();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -60,7 +63,7 @@ export default function Navbar() {
         }`}
       >
         {/* Brand — start side (right in RTL, left in LTR) */}
-        <a href="#home" aria-label={t("הדר אלימלך — דף הבית", "Hadar Elimelech — Home")} className="group flex items-center">
+        <a href="/#home" aria-label={t("הדר אלימלך — דף הבית", "Hadar Elimelech — Home")} className="group flex items-center">
           <Image
             src="/logo-float.png"
             alt={t("הדר אלימלך — משרד עורכי דין", "Hadar Elimelech — Law Office")}
@@ -73,7 +76,7 @@ export default function Navbar() {
 
         {/* Centered links */}
         <ul className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-9 lg:flex">
-          {LINKS.map((l) => (
+          {links.map((l) => (
             <li key={l.href}>
               <a
                 href={l.href}
@@ -111,7 +114,7 @@ export default function Navbar() {
           className="mx-auto mt-3 max-w-6xl overflow-hidden rounded-3xl border border-white/10 bg-black/70 backdrop-blur-xl lg:hidden"
         >
           <ul className="flex flex-col gap-1 px-6 py-4">
-            {LINKS.map((l) => (
+            {links.map((l) => (
               <li key={l.href}>
                 <a
                   href={l.href}
