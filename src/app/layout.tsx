@@ -6,6 +6,7 @@ import {
   Heebo,
 } from "next/font/google";
 import "./globals.css";
+import { SITE } from "@/lib/site";
 
 /* Heavy display sans — massive block-letter hero headline */
 const heebo = Heebo({
@@ -42,7 +43,54 @@ const cormorant = Cormorant_Garamond({
 const TITLE = "הדר אלימלך - משרד עורכי דין | חדלות פירעון ושיקום כלכלי";
 const DESCRIPTION =
   "אסטרטגיה אישית וממוקדת תוצאות להחזרת השליטה הפיננסית שלך. מנהיגות משפטית בחדלות פירעון, הסדרי חובות מורכבים ופירוק חברות.";
-const SITE_URL = "https://hadar-elimelech.co.il";
+const SITE_URL = SITE.url;
+
+/* Structured data: tells Google + AI assistants who Hadar is, what she does, where. */
+const JSON_LD = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": ["LegalService", "LocalBusiness"],
+      "@id": `${SITE_URL}/#office`,
+      name: "הדר אלימלך — משרד עורכי דין",
+      alternateName: "Hadar Elimelech Law Office",
+      url: SITE_URL,
+      image: `${SITE_URL}/og.png`,
+      logo: `${SITE_URL}/logo.png`,
+      description: DESCRIPTION,
+      telephone: `+${SITE.phoneIntl}`,
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: "האורגים 11",
+        addressLocality: "אשדוד",
+        addressCountry: "IL",
+      },
+      areaServed: { "@type": "Country", name: "Israel" },
+      availableLanguage: ["he"],
+      knowsAbout: [
+        "חדלות פירעון",
+        "צו הפטר",
+        "מחיקת חובות",
+        "ביטול עיקולים",
+        "הוצאה לפועל",
+        "הסדרי חובות מול בנקים",
+        "שיקום כלכלי",
+      ],
+      founder: { "@id": `${SITE_URL}/#hadar` },
+      sameAs: Object.values(SITE.social).filter((u) => u !== "#"),
+    },
+    {
+      "@type": "Person",
+      "@id": `${SITE_URL}/#hadar`,
+      name: "הדר אלימלך",
+      alternateName: "Hadar Elimelech",
+      jobTitle: "עורכת דין",
+      image: `${SITE_URL}/hadar-portrait.jpg`,
+      worksFor: { "@id": `${SITE_URL}/#office` },
+      knowsAbout: ["חדלות פירעון", "מחיקת חובות", "ביטול עיקולים", "הוצאה לפועל"],
+    },
+  ],
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -96,7 +144,15 @@ export default function RootLayout({
       dir="rtl"
       className={`${frank.variable} ${assistant.variable} ${cormorant.variable} ${heebo.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-obsidian text-ink">{children}</body>
+      <body className="min-h-full bg-obsidian text-ink">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(JSON_LD).replace(/</g, "\\u003c"),
+          }}
+        />
+        {children}
+      </body>
     </html>
   );
 }
