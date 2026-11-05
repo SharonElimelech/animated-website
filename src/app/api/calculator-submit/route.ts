@@ -14,12 +14,16 @@ import { Resend } from "resend";
  *   LEAD_FROM_EMAIL         - verified "from" address (defaults to Resend sandbox)
  */
 
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
-
-const TO = process.env.LEAD_NOTIFICATION_EMAIL || "office@hadar-elimelech.co.il";
-const FROM = process.env.LEAD_FROM_EMAIL || "Hadar Leads <onboarding@resend.dev>";
+// Read env per request: on Cloudflare Workers env vars are only guaranteed at request time.
+const config = () => ({
+  resend: process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null,
+  // Comma-separated list, e.g. "a@x.com,b@y.com"
+  to: (process.env.LEAD_NOTIFICATION_EMAIL || "aruitkh11@gmail.com")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean),
+  from: process.env.LEAD_FROM_EMAIL || "Hadar Leads <onboarding@resend.dev>",
+});
 
 // Lightweight in-memory rate limiter (per IP, best-effort on serverless)
 const hits = new Map<string, number[]>();
@@ -89,10 +93,11 @@ export async function POST(req: Request) {
         </table>
       </div>`;
 
+    const { resend, to, from } = config();
     if (resend) {
       const { error } = await resend.emails.send({
-        from: FROM,
-        to: TO,
+        from,
+        to,
         subject: `🚨 ליד חדש ממחשבון החובות - ${String(name)}`,
         html,
         replyTo: String(email),
