@@ -6,9 +6,8 @@ import { SITE, telLink, whatsappLink } from "@/lib/site";
 
 type Props = { params: Promise<{ slug: string }> };
 
-// Unknown slugs (and drafts in production) 404 instead of rendering on demand.
-export const dynamicParams = false;
-
+// Pages render on demand too (OpenNext here has no incremental cache for prebuilt pages);
+// unknown slugs and drafts still 404 via notFound() below.
 export function generateStaticParams() {
   return visibleArticles().map((a) => ({ slug: a.slug }));
 }

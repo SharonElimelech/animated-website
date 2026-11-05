@@ -2,7 +2,12 @@
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"main": ".open-next/worker.js",
 	"name": "hadar-new-website",
-	"pages_build_output_dir": ".open-next/assets",
+	// Deployed as a Cloudflare Worker (npm run deploy), not Pages: the Worker needs the
+	// ASSETS binding to serve pages, and pages_build_output_dir makes wrangler treat it as Pages.
+	"assets": {
+		"directory": ".open-next/assets",
+		"binding": "ASSETS"
+	},
 	"compatibility_date": "2026-06-08",
 	"compatibility_flags": [
 		"nodejs_compat",
