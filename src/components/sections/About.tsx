@@ -59,7 +59,7 @@ export default function About() {
         <div>
           <Reveal className="mb-6 flex items-center gap-4" amount={0.6}>
             <span className="h-px w-10 bg-gold" />
-            <span className="text-shadow-lux text-xs font-light tracking-[0.4em] text-gold/85">
+            <span className="text-shadow-lux text-xs font-normal tracking-[0.4em] text-gold/85">
               {t("אודות המשרד", "About the Firm")}
             </span>
           </Reveal>
@@ -75,7 +75,7 @@ export default function About() {
           </Reveal>
 
           <Reveal delay={0.1} amount={0.5}>
-            <blockquote className="text-shadow-lux mt-8 border-s-2 border-gold/60 ps-6 text-base font-light leading-relaxed text-muted sm:text-lg">
+            <blockquote className="text-shadow-lux mt-8 border-s-2 border-gold/60 ps-6 text-base font-normal leading-relaxed text-muted sm:text-lg">
               {t(
                 "״כל משבר כלכלי הוא נקודת מפנה. אנו בונים עבורכם אסטרטגיה מותאמת אישית, עם ליווי צמוד ודיסקרטי — מהצעד הראשון ועד להחזרת השליטה המלאה על חייכם.״",
                 "“Every financial crisis is a turning point. We build a tailor-made strategy for you, with close and discreet guidance — from the first step to fully restoring control over your life.”",
@@ -126,7 +126,7 @@ export default function About() {
           {/* Boutique badge */}
           <div className="absolute -bottom-8 end-6 flex h-32 w-32 flex-col items-center justify-center gap-2 rounded-full border border-gold/40 bg-obsidian/90 text-center backdrop-blur-sm lg:-end-8">
             <Award className="h-6 w-6 text-gold" strokeWidth={1.4} />
-            <span className="px-4 text-[0.7rem] font-light leading-tight text-muted">
+            <span className="px-4 text-[0.7rem] font-normal leading-tight text-muted">
               {t("משרד בוטיק", "Boutique firm")}
               <br />
               {t("לשיקום כלכלי", "for economic recovery")}
@@ -151,7 +151,7 @@ function ServiceCard({ service }: { service: Service }) {
       <h3 className="relative mt-6 text-lg font-bold text-ink">
         {t(service.titleHe, service.titleEn)}
       </h3>
-      <p className="relative mt-2 text-sm font-light text-muted">
+      <p className="relative mt-2 text-sm font-normal text-muted">
         {t(service.descHe, service.descEn)}
       </p>
     </article>

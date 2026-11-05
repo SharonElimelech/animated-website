@@ -43,7 +43,7 @@ export default function MasterHero() {
   ];
 
   return (
-    <section id="home" ref={ref} className="relative min-h-screen w-full">
+    <section id="home" ref={ref} className="relative min-h-screen w-full overflow-x-clip">
       {/* Background */}
       <motion.div
         style={{ opacity: bgOpacity, scale: bgScale }}
@@ -62,6 +62,8 @@ export default function MasterHero() {
           <Fallback />
         )}
         <div aria-hidden className="absolute inset-0 rtl:bg-gradient-to-l ltr:bg-gradient-to-r from-obsidian/85 via-obsidian/20 to-transparent" />
+        {/* ponytail: side gradient doesn't cover text on narrow screens */}
+        <div aria-hidden className="absolute inset-0 bg-obsidian/55 lg:hidden" />
         <div aria-hidden className="absolute inset-0 bg-[radial-gradient(circle_at_15%_45%,rgba(212,175,55,0.18),transparent_52%)]" />
       </motion.div>
 
@@ -73,11 +75,11 @@ export default function MasterHero() {
         style={{ opacity: contentOpacity, y: contentY }}
         className="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col justify-center px-6 py-32 lg:px-10"
       >
-        <div className="max-w-2xl text-start">
+        <div className="hero-glass max-w-2xl rounded-[2rem] p-5 text-start sm:p-10">
           {/* Eyebrow */}
           <motion.p
             variants={item}
-            className="text-shadow-lux text-xs font-light tracking-[0.35em] text-gold/90 sm:text-sm"
+            className="text-shadow-lux text-xs font-normal tracking-[0.35em] text-gold/90 sm:text-sm"
           >
             {t("שיקום כלכלי · חדלות פירעון · הסדרי חובות", "Economic Recovery · Insolvency · Debt Settlements")}
           </motion.p>
@@ -87,7 +89,7 @@ export default function MasterHero() {
             {badges.map((b) => (
               <span
                 key={b.en}
-                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-3.5 py-1.5 text-xs font-light text-ink/90 backdrop-blur-sm"
+                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-3.5 py-1.5 text-xs font-normal text-ink/90 backdrop-blur-sm"
               >
                 <b.icon className="h-3.5 w-3.5 text-gold" strokeWidth={1.6} />
                 {t(b.he, b.en)}
@@ -100,7 +102,7 @@ export default function MasterHero() {
             variants={item}
             className="mt-7 font-serif text-4xl font-bold leading-[1.1] text-[#f4ecdd] [text-shadow:0_2px_24px_rgba(0,0,0,0.8)] sm:text-6xl lg:text-7xl"
           >
-            {t("מחזירים לך את", "We give you back")}
+            {t("מחזירים לך את", "We give you back")}{" "}
             <span className="mt-1 block gold-text">
               {t("השליטה על החיים.", "control over your life.")}
             </span>
@@ -109,7 +111,7 @@ export default function MasterHero() {
           {/* Sub-headline */}
           <motion.p
             variants={item}
-            className="text-shadow-lux mt-7 max-w-xl border-s-2 border-gold/70 ps-4 text-base font-light leading-relaxed text-ink/90 sm:text-lg"
+            className="text-shadow-lux mt-7 max-w-xl border-s-2 border-gold/70 ps-4 text-base font-normal leading-relaxed text-ink/90 sm:text-lg"
           >
             {t(
               "ליווי משפטי מנוסה בהסדרי חובות, חדלות פירעון ושיקום כלכלי — בדיסקרטיות מלאה ובגישה אנושית, עד לפתיחת דף חדש.",
@@ -120,7 +122,7 @@ export default function MasterHero() {
           {/* Extra paragraph */}
           <motion.p
             variants={item}
-            className="text-shadow-lux mt-5 max-w-xl text-sm font-light leading-relaxed text-ink/70 sm:text-base"
+            className="text-shadow-lux mt-5 max-w-xl text-sm font-normal leading-relaxed text-ink/90 sm:text-base"
           >
             {t(
               "כל תיק מתחיל בהקשבה. אנחנו לוקחים על עצמנו את הלחץ מול הנושים, בונים אסטרטגיה אישית וברורה, ומלווים אתכם צעד אחר צעד — עד למחיקת החובות וחזרה לשגרה רגועה ובטוחה.",
@@ -145,7 +147,7 @@ export default function MasterHero() {
             <a
               href={telLink}
               dir="ltr"
-              className="inline-flex items-center gap-2 text-sm font-light text-ink/80 transition-colors hover:text-gold"
+              className="inline-flex items-center gap-2 py-3 text-sm font-normal text-ink/90 transition-colors hover:text-gold"
             >
               <Phone className="h-4 w-4 text-gold" strokeWidth={1.6} />
               {SITE.phone}
@@ -153,7 +155,7 @@ export default function MasterHero() {
           </motion.div>
 
           {/* Microcopy */}
-          <motion.p variants={item} className="text-shadow-lux mt-5 text-xs font-light tracking-wide text-muted">
+          <motion.p variants={item} className="text-shadow-lux mt-5 text-xs font-normal tracking-wide text-muted">
             {t(
               "ייעוץ ראשוני ללא עלות · ללא התחייבות · בדיסקרטיות מלאה",
               "Free initial consultation · No obligation · Fully confidential",

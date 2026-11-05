@@ -70,7 +70,7 @@ export default function SiteSearch() {
       <button
         onClick={() => setOpen(true)}
         aria-label={t("חיפוש", "Search")}
-        className="text-ink/70 transition-colors hover:text-gold"
+        className="text-ink/90 transition-colors hover:text-gold"
       >
         <Search className="h-5 w-5" strokeWidth={1.6} />
       </button>
@@ -117,7 +117,7 @@ export default function SiteSearch() {
               {/* Results */}
               <ul className="max-h-80 overflow-y-auto py-2">
                 {results.length === 0 ? (
-                  <li className="px-5 py-6 text-center text-sm font-light text-muted">
+                  <li className="px-5 py-6 text-center text-sm font-normal text-muted">
                     {t("לא נמצאו תוצאות", "No results found")}
                   </li>
                 ) : (
@@ -137,7 +137,7 @@ export default function SiteSearch() {
                 )}
               </ul>
 
-              <div className="border-t border-line px-5 py-2.5 text-center text-[0.7rem] font-light text-muted">
+              <div className="border-t border-line px-5 py-2.5 text-center text-[0.7rem] font-normal text-muted">
                 {t("טיפ: לחצו", "Tip: press")} <kbd className="text-gold">Ctrl/⌘ K</kbd>
               </div>
             </motion.div>

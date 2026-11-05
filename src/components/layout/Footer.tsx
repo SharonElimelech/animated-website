@@ -48,7 +48,7 @@ export default function Footer() {
               <a
                 key={l.href}
                 href={l.href}
-                className="text-sm font-light text-muted transition-colors hover:text-gold"
+                className="text-sm font-normal text-muted transition-colors hover:text-gold"
               >
                 {t(l.he, l.en)}
               </a>
@@ -88,7 +88,7 @@ export default function Footer() {
 
         <div className="mt-12 h-px w-full rule-gold opacity-30" />
 
-        <div className="mt-8 flex flex-col items-center justify-between gap-4 text-xs font-light text-muted/60 sm:flex-row">
+        <div className="mt-8 flex flex-col items-center justify-between gap-4 text-xs font-normal text-muted sm:flex-row">
           <p>
             ©{" "}{new Date().getFullYear()}{" "}
             {t(

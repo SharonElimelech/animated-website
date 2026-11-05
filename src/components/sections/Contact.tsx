@@ -28,7 +28,7 @@ export default function Contact() {
       className="relative mx-auto max-w-7xl px-6 py-28 lg:px-10 lg:py-40"
     >
       <Reveal className="mb-14 text-center" amount={0.6}>
-        <span className="text-shadow-lux text-xs font-light tracking-[0.4em] text-gold/85">
+        <span className="text-shadow-lux text-xs font-normal tracking-[0.4em] text-gold/85">
           {t("תהיו איתנו בקשר", "Get in touch")}
         </span>
       </Reveal>
@@ -47,7 +47,7 @@ export default function Contact() {
           </Reveal>
 
           <Reveal delay={0.1} amount={0.5}>
-            <p className="text-shadow-lux mt-6 max-w-md text-base font-light leading-relaxed text-muted">
+            <p className="text-shadow-lux mt-6 max-w-md text-base font-normal leading-relaxed text-muted">
               {t(
                 "המשרד זמין עבורכם לכל שאלה. אנחנו כאן כדי להעניק לכם את השקט הנפשי שמגיע לכם ולהוציא אתכם לדרך חדשה.",
                 "Our office is available for any question. We're here to give you the peace of mind you deserve and set you on a new path.",
@@ -64,7 +64,7 @@ export default function Contact() {
                 <Phone className="h-5 w-5" strokeWidth={1.6} />
               </span>
               <span className="text-end">
-                <span className="block text-xs font-light text-muted">
+                <span className="block text-xs font-normal text-muted">
                   {t("חייגו עכשיו", "Call now")}
                 </span>
                 <span className="mt-1 block text-base font-bold text-ink" dir="ltr">
@@ -78,7 +78,7 @@ export default function Contact() {
                 <MapPin className="h-5 w-5" strokeWidth={1.6} />
               </span>
               <span className="text-end">
-                <span className="block text-xs font-light text-muted">
+                <span className="block text-xs font-normal text-muted">
                   {t("כתובת המשרד", "Office address")}
                 </span>
                 <span className="mt-1 block text-base font-bold text-ink">
@@ -107,7 +107,7 @@ export default function Contact() {
             <h3 className="font-serif text-3xl font-bold text-ink">
               {t("שלחו פנייה דיסקרטית", "Send a discreet inquiry")}
             </h3>
-            <p className="mt-2 text-sm font-light text-muted">
+            <p className="mt-2 text-sm font-normal text-muted">
               {t("נחזור אליכם תוך 24 שעות עם מענה", "We'll get back to you within 24 hours")}
             </p>
 
@@ -132,7 +132,7 @@ export default function Contact() {
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     dir="ltr"
-                    className="w-full rounded-lg border border-line bg-obsidian px-4 py-3 text-ink outline-none transition-colors placeholder:text-muted/50 focus:border-gold/60"
+                    className="w-full rounded-lg border border-line bg-obsidian px-4 py-3 text-ink outline-none transition-colors placeholder:text-muted focus:border-gold/60"
                   />
                   <select
                     value={prefix}
@@ -174,7 +174,7 @@ export default function Contact() {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block text-start">
-      <span className="mb-2 block text-xs font-light tracking-wide text-muted">
+      <span className="mb-2 block text-xs font-normal tracking-wide text-muted">
         {label}
       </span>
       {children}
