@@ -10,8 +10,8 @@ import { motion, useScroll, useSpring, useMotionValueEvent } from "framer-motion
  *    progress; each decoded frame is painted to a full-screen <canvas>.
  *  - High-DPI: backing store = CSS size × devicePixelRatio + ctx.scale(dpr) so
  *    frames render crisply at native screen density (no softness).
- *  - NO dimming overlay — the background stays fully bright. Text legibility is
- *    handled by the deep glass bubble in the Hero.
+ *  - A 60% scrim (below) dims the video so text over it stays readable; the
+ *    video must stay all-keyframe (ffmpeg -g 1) or scroll-seeks stutter.
  *  - Zero React state on scroll: progress lives in a ref (useMotionValueEvent);
  *    an rAF loop draws imperatively. Seeks gated on `seeked` + frame-snapped.
  */
@@ -150,6 +150,9 @@ export default function ScrubBackground() {
       ) : (
         <FallbackBackdrop />
       )}
+
+      {/* ponytail: dim scrim so text over the moving video stays readable */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 bg-obsidian/60" />
 
       {/* Hidden source video — decoded for canvas, never composited */}
       <video

@@ -50,7 +50,7 @@ export default function Process() {
       className="relative mx-auto max-w-7xl px-6 py-28 text-center lg:px-10 lg:py-40"
     >
       <Reveal amount={0.6}>
-        <span className="text-shadow-lux text-xs font-light tracking-[0.4em] text-gold/85">
+        <span className="text-shadow-lux text-xs font-normal tracking-[0.4em] text-gold/85">
           {t("התהליך שלכם", "Your Process")}
         </span>
       </Reveal>
@@ -63,7 +63,7 @@ export default function Process() {
       </Reveal>
 
       <Reveal delay={0.1} amount={0.5}>
-        <p className="text-shadow-lux mx-auto mt-6 max-w-2xl text-base font-light leading-relaxed text-muted">
+        <p className="text-shadow-lux mx-auto mt-6 max-w-2xl text-base font-normal leading-relaxed text-muted">
           {t(
             "אנחנו מלווים אתכם צעד אחר צעד, בשקיפות מלאה, עד לניצחון הסופי.",
             "We guide you step by step, in full transparency, all the way to the final win.",
@@ -83,7 +83,7 @@ export default function Process() {
               <h3 className="mt-7 text-xl font-bold text-ink">
                 {t(step.titleHe, step.titleEn)}
               </h3>
-              <p className="mt-3 max-w-[14rem] text-sm font-light leading-relaxed text-muted">
+              <p className="mt-3 max-w-[14rem] text-sm font-normal leading-relaxed text-muted">
                 {t(step.descHe, step.descEn)}
               </p>
             </div>

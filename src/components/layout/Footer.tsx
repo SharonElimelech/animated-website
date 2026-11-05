@@ -20,13 +20,16 @@ function InstagramIcon({ className }: { className?: string }) {
 }
 
 const NAV = [
-  { he: "אודות המשרד", en: "About", href: "#about" },
-  { he: "המסלול שלך", en: "Your Process", href: "#process" },
-  { he: "שאלות נפוצות", en: "FAQ", href: "#faq" },
-  { he: "צור קשר", en: "Contact", href: "#contact" },
+  { he: "אודות המשרד", en: "About", href: "/#about" },
+  { he: "המסלול שלך", en: "Your Process", href: "/#process" },
+  { he: "שאלות נפוצות", en: "FAQ", href: "/#faq" },
+  { he: "צור קשר", en: "Contact", href: "/#contact" },
 ];
 
-export default function Footer() {
+export default function Footer({ showArticles = false }: { showArticles?: boolean }) {
+  const nav = showArticles
+    ? [...NAV.slice(0, 3), { he: "מאמרים", en: "Articles", href: "/articles" }, ...NAV.slice(3)]
+    : NAV;
   const { t } = useI18n();
   return (
     <footer className="relative z-10 border-t border-line bg-obsidian/80 px-6 py-16 backdrop-blur-xl lg:px-10">
@@ -44,11 +47,11 @@ export default function Footer() {
 
           {/* Quick nav */}
           <nav className="flex flex-wrap gap-x-8 gap-y-3">
-            {NAV.map((l) => (
+            {nav.map((l) => (
               <a
                 key={l.href}
                 href={l.href}
-                className="text-sm font-light text-muted transition-colors hover:text-gold"
+                className="text-sm font-normal text-muted transition-colors hover:text-gold"
               >
                 {t(l.he, l.en)}
               </a>
@@ -88,7 +91,7 @@ export default function Footer() {
 
         <div className="mt-12 h-px w-full rule-gold opacity-30" />
 
-        <div className="mt-8 flex flex-col items-center justify-between gap-4 text-xs font-light text-muted/60 sm:flex-row">
+        <div className="mt-8 flex flex-col items-center justify-between gap-4 text-xs font-normal text-muted sm:flex-row">
           <p>
             ©{" "}{new Date().getFullYear()}{" "}
             {t(

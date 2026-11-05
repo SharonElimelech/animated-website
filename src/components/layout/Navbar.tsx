@@ -8,26 +8,26 @@ import { useI18n, type Lang } from "@/lib/i18n";
 import SiteSearch from "./SiteSearch";
 
 const LINKS = [
-  { he: "בית", en: "Home", href: "#home" },
-  { he: "אודות", en: "About", href: "#about" },
-  { he: "מחשבון חובות", en: "Calculator", href: "#calculator" },
-  { he: "המסלול", en: "Process", href: "#process" },
-  { he: "צור קשר", en: "Contact", href: "#contact" },
+  { he: "בית", en: "Home", href: "/#home" },
+  { he: "אודות", en: "About", href: "/#about" },
+  { he: "מחשבון חובות", en: "Calculator", href: "/#calculator" },
+  { he: "המסלול", en: "Process", href: "/#process" },
+  { he: "צור קשר", en: "Contact", href: "/#contact" },
 ];
 
 function LangSwitch({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => void }) {
   return (
-    <span className="text-shadow-lux text-sm font-light tracking-wide">
+    <span className="text-shadow-lux text-sm font-normal tracking-wide">
       <button
         onClick={() => setLang("he")}
-        className={lang === "he" ? "text-gold" : "text-ink/70 hover:text-ink"}
+        className={lang === "he" ? "text-gold" : "text-ink/90 hover:text-ink"}
       >
         עב
       </button>
       <span className="mx-1.5 text-white/30">|</span>
       <button
         onClick={() => setLang("en")}
-        className={lang === "en" ? "text-gold" : "text-ink/70 hover:text-ink"}
+        className={lang === "en" ? "text-gold" : "text-ink/90 hover:text-ink"}
       >
         EN
       </button>
@@ -35,7 +35,10 @@ function LangSwitch({ lang, setLang }: { lang: Lang; setLang: (l: Lang) => void 
   );
 }
 
-export default function Navbar() {
+export default function Navbar({ showArticles = false }: { showArticles?: boolean }) {
+  const links = showArticles
+    ? [...LINKS.slice(0, 4), { he: "מאמרים", en: "Articles", href: "/articles" }, ...LINKS.slice(4)]
+    : LINKS;
   const { t, lang, setLang } = useI18n();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
@@ -60,7 +63,7 @@ export default function Navbar() {
         }`}
       >
         {/* Brand — start side (right in RTL, left in LTR) */}
-        <a href="#home" aria-label={t("הדר אלימלך — דף הבית", "Hadar Elimelech — Home")} className="group flex items-center">
+        <a href="/#home" aria-label={t("הדר אלימלך — דף הבית", "Hadar Elimelech — Home")} className="group flex items-center">
           <Image
             src="/logo-float.png"
             alt={t("הדר אלימלך — משרד עורכי דין", "Hadar Elimelech — Law Office")}
@@ -73,11 +76,11 @@ export default function Navbar() {
 
         {/* Centered links */}
         <ul className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-9 lg:flex">
-          {LINKS.map((l) => (
+          {links.map((l) => (
             <li key={l.href}>
               <a
                 href={l.href}
-                className="group relative text-shadow-lux text-sm font-light tracking-wide text-ink/80 transition-colors hover:text-ink"
+                className="group relative text-shadow-lux text-sm font-normal tracking-wide text-ink/90 transition-colors hover:text-ink"
               >
                 {t(l.he, l.en)}
                 <span className="absolute -bottom-1.5 end-0 h-px w-0 bg-gold transition-all duration-300 group-hover:w-full" />
@@ -96,7 +99,8 @@ export default function Navbar() {
         <button
           onClick={() => setOpen((v) => !v)}
           aria-label={t("תפריט", "Menu")}
-          className="text-ink lg:hidden"
+          aria-expanded={open}
+          className="-m-2.5 p-2.5 text-ink lg:hidden"
         >
           {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
@@ -110,12 +114,12 @@ export default function Navbar() {
           className="mx-auto mt-3 max-w-6xl overflow-hidden rounded-3xl border border-white/10 bg-black/70 backdrop-blur-xl lg:hidden"
         >
           <ul className="flex flex-col gap-1 px-6 py-4">
-            {LINKS.map((l) => (
+            {links.map((l) => (
               <li key={l.href}>
                 <a
                   href={l.href}
                   onClick={() => setOpen(false)}
-                  className="block py-3 text-base font-light text-ink/80 hover:text-gold"
+                  className="block py-3 text-base font-normal text-ink/90 hover:text-gold"
                 >
                   {t(l.he, l.en)}
                 </a>

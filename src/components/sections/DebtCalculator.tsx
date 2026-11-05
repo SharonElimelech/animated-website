@@ -82,13 +82,13 @@ export default function DebtCalculator() {
     <section id="calculator" className="relative mx-auto max-w-3xl px-6 py-28 lg:py-36">
       {/* Heading */}
       <div className="mb-12 text-center">
-        <span className="text-shadow-lux text-xs font-light tracking-[0.4em] text-gold/90">
+        <span className="text-shadow-lux text-xs font-normal tracking-[0.4em] text-gold/90">
           {t("אבחון ראשוני · 60 שניות", "Initial assessment · 60 seconds")}
         </span>
         <h2 className="mt-6 font-serif text-4xl font-bold text-ink [text-shadow:0_2px_30px_rgba(0,0,0,0.85)] sm:text-5xl">
           {t("מחשבון חובות", "Debt Calculator")}
         </h2>
-        <p className="text-shadow-lux mx-auto mt-5 max-w-xl text-base font-light leading-relaxed text-ink/80">
+        <p className="text-shadow-lux mx-auto mt-5 max-w-xl text-base font-normal leading-relaxed text-ink/90">
           {t(
             "כלי אבחון דיסקרטי שיבחן את התאמתך למסלולי הפחתת חובות, ביטול עיקולים ושיקום כלכלי — ללא התחייבות.",
             "A discreet assessment tool that checks your fit for debt-reduction, foreclosure-cancellation and economic-recovery tracks — with no obligation.",
@@ -108,7 +108,7 @@ export default function DebtCalculator() {
           <>
             {/* Progress */}
             <div className="mb-8">
-              <div className="mb-3 flex items-center justify-between text-xs font-light text-muted">
+              <div className="mb-3 flex items-center justify-between text-xs font-normal text-muted">
                 <span>
                   {t("שלב", "Step")} {step + 1} {t("מתוך", "of")} {STEP_COUNT}
                 </span>
@@ -198,7 +198,7 @@ export default function DebtCalculator() {
                       onChange={(e) => setCompany(e.target.value)}
                       className="absolute left-[-9999px] h-0 w-0 opacity-0"
                     />
-                    <p className="flex items-center justify-end gap-1.5 text-xs font-light text-muted">
+                    <p className="flex items-center justify-end gap-1.5 text-xs font-normal text-muted">
                       <ShieldCheck className="h-3.5 w-3.5 text-gold/80" />
                       {t(
                         "הפרטים נשמרים בדיסקרטיות מלאה תחת חיסיון עו״ד–לקוח",
@@ -224,7 +224,7 @@ export default function DebtCalculator() {
               {step > 0 ? (
                 <button
                   onClick={() => setStep((s) => s - 1)}
-                  className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-light text-muted transition-colors hover:text-ink"
+                  className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-sm font-normal text-muted transition-colors hover:text-ink"
                 >
                   <ArrowRight className="h-4 w-4 ltr:-scale-x-100" />
                   {t("חזרה", "Back")}
@@ -286,7 +286,7 @@ function OptionRow({
       >
         {selected && <Check className="h-4 w-4" strokeWidth={3} />}
       </span>
-      <span className={`text-sm sm:text-base ${selected ? "text-ink" : "text-ink/80"}`}>
+      <span className={`text-sm sm:text-base ${selected ? "text-ink" : "text-ink/90"}`}>
         {label}
       </span>
     </button>
@@ -296,7 +296,7 @@ function OptionRow({
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block text-start">
-      <span className="mb-2 block text-xs font-light tracking-wide text-muted">{label}</span>
+      <span className="mb-2 block text-xs font-normal tracking-wide text-muted">{label}</span>
       {children}
     </label>
   );
@@ -310,7 +310,7 @@ function LoadingState() {
       <p className="mt-6 font-serif text-2xl text-ink">
         {t("מחשב אסטרטגיית שיקום…", "Calculating recovery strategy…")}
       </p>
-      <p className="mt-2 text-sm font-light text-muted">
+      <p className="mt-2 text-sm font-normal text-muted">
         {t("מנתחים את הנתונים מול מסלולי החוק", "Analyzing your data against the legal tracks")}
       </p>
     </div>
@@ -332,7 +332,7 @@ function SuccessState() {
       <h3 className="mt-7 font-serif text-2xl font-bold text-ink sm:text-3xl">
         {t("אסטרטגיית השיקום שלך מוכנה", "Your recovery strategy is ready")}
       </h3>
-      <p className="text-shadow-lux mx-auto mt-4 max-w-md text-base font-light leading-relaxed text-ink/85">
+      <p className="text-shadow-lux mx-auto mt-4 max-w-md text-base font-normal leading-relaxed text-ink/85">
         {t(
           "נמצאה התאמה ראשונית גבוהה להפחתת חובות ומחיקת עיקולים. נציג מהמשרד יחזור אליך בהקדם עם הפירוט המלא.",
           "A high preliminary match was found for reducing debts and cancelling foreclosures. A representative will contact you shortly with the full details.",

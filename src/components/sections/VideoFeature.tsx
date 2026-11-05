@@ -19,7 +19,7 @@ export default function VideoFeature() {
       className="relative mx-auto max-w-4xl px-6 py-28 text-center lg:py-36"
     >
       <Reveal amount={0.6}>
-        <span className="text-shadow-lux text-xs font-light tracking-[0.4em] text-gold/85">
+        <span className="text-shadow-lux text-xs font-normal tracking-[0.4em] text-gold/85">
           {t("מי שפועל · שולט בסיטואציה", "Those who act · stay in control")}
         </span>
       </Reveal>
@@ -63,7 +63,7 @@ export default function VideoFeature() {
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(5,5,5,0.55),rgba(5,5,5,0.8))]" />
               <span className="absolute start-6 top-6 text-start text-sm text-ink">
                 {t("עורכת דין הדר אלימלך לחדלות פירעון", "Hadar Elimelech — Insolvency Law")}
-                <span className="mt-1 block text-xs font-light text-muted">
+                <span className="mt-1 block text-xs font-normal text-muted">
                   {t("שרון אלימלך", "Sharon Elimelech")}
                 </span>
               </span>
@@ -71,7 +71,7 @@ export default function VideoFeature() {
                 <Play className="relative h-8 w-8 translate-x-0.5 fill-obsidian" />
               </span>
               {!YOUTUBE_ID && (
-                <span className="absolute bottom-6 text-xs font-light text-muted">
+                <span className="absolute bottom-6 text-xs font-normal text-muted">
                   (הוסיפו מזהה YouTube ב־VideoFeature.tsx כדי להפעיל)
                 </span>
               )}
