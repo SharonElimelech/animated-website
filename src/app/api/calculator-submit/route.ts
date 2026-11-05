@@ -1,4 +1,5 @@
-export const runtime = 'edge';
+// No `runtime = "edge"`: OpenNext runs every route in the Worker's Node runtime, and the edge
+// flag made this route fail to load in the Cloudflare build (500 instead of 400/200).
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 
