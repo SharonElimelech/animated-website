@@ -20,17 +20,21 @@ export default function ScrubBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const progress = useRef(0);
+  const lastMove = useRef(0); // when progress last changed (ms)
   const [fallback, setFallback] = useState(false);
 
   const { scrollYProgress } = useScroll();
+  // Critically damped and quick (Apple: damping 1.0, response ~0.35s): follows the
+  // scroll smoothly but settles in ~0.5s instead of a long slow-motion tail.
   const smooth = useSpring(scrollYProgress, {
-    stiffness: 90,
-    damping: 28,
-    mass: 0.4,
-    restDelta: 0.0001,
+    stiffness: 300,
+    damping: 35,
+    mass: 1,
+    restDelta: 0.0005,
   });
   useMotionValueEvent(smooth, "change", (v) => {
     progress.current = v;
+    lastMove.current = performance.now();
   });
 
   useEffect(() => {
@@ -46,7 +50,12 @@ export default function ScrubBackground() {
       maxCache: 6, // decoded frames kept around (≈8MB each at 1080p)
       seekTimeoutMs: 400, // give up on a stuck seek
       reducedMotionFrame: 0.5, // static frame (fraction of the video) under reduced motion
+      settleMs: 120, // no movement for this long = scrolling stopped
+      snapRate: 0.25, // per-frame ease toward the nearest single frame once stopped
     };
+    // Wide/high-DPI screens get the 1440p file so the frame isn't upscaled ~1.8x.
+    const physicalWidth = Math.max(window.innerWidth, window.screen.width) * Math.min(window.devicePixelRatio || 1, 2);
+    video.src = physicalWidth > 2200 ? "/hero-video-1440.mp4" : "/hero-video.mp4";
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     // Only 145 frames span the whole page (~46px of scroll each), so a slow scroll
@@ -60,6 +69,7 @@ export default function ScrubBackground() {
     let rafId = 0;
     let lastKey = "";
     let ready = false;
+    let tShown = 0; // blend factor actually painted
 
     // object-fit: cover, drawn in CSS pixels (ctx pre-scaled by DPR)
     const paint = (a: ImageBitmap, b: ImageBitmap | undefined, t: number) => {
@@ -176,7 +186,17 @@ export default function ScrubBackground() {
         const f = Math.min(Math.max(pos, 0), frames - 1);
         const i = Math.floor(f);
         const j = Math.min(i + 1, frames - 1);
-        const t = reducedMotion ? 0 : f - i;
+        const raw = reducedMotion ? 0 : f - i;
+        // While scrolling, blend by the exact position (smooth). Once stopped, ease to
+        // the nearest single frame so the resting image is sharp, not a double exposure.
+        const moving = now - lastMove.current < CFG.settleMs;
+        if (moving) tShown = raw;
+        else {
+          const target = raw < 0.5 ? 0 : 1;
+          tShown += (target - tShown) * CFG.snapRate;
+          if (Math.abs(target - tShown) < 0.01) tShown = target;
+        }
+        const t = tShown;
         wantIndex = i;
 
         // Decode what the current position needs: frame i first, then i+1.
@@ -225,7 +245,6 @@ export default function ScrubBackground() {
       {/* Hidden source video — decoded for canvas, never composited */}
       <video
         ref={videoRef}
-        src="/hero-video.mp4"
         muted
         playsInline
         preload="auto"
