@@ -52,7 +52,11 @@ export default function ScrubBackground() {
       reducedMotionFrame: 0.5, // static frame (fraction of the video) under reduced motion
       settleMs: 120, // no movement for this long = scrolling stopped
       snapRate: 0.25, // per-frame ease toward the nearest single frame once stopped
+      playMinFps: 30, // forward scroll faster than this (frames/s) plays natively
+      maxRate: 4, // playbackRate cap while playing
+      catchUp: 2, // extra rate per second of lag behind the scroll position
     };
+    let playing = false;
     // Wide/high-DPI screens get the 1440p file so the frame isn't upscaled ~1.8x.
     const physicalWidth = Math.max(window.innerWidth, window.screen.width) * Math.min(window.devicePixelRatio || 1, 2);
     video.src = physicalWidth > 2200 ? "/hero-video-1440.mp4" : "/hero-video.mp4";
@@ -87,6 +91,17 @@ export default function ScrubBackground() {
         ctx.drawImage(b, dx, dy, dw, dh);
         ctx.globalAlpha = 1;
       }
+    };
+    // Live frame while the video plays (fast forward scroll).
+    const paintVideo = () => {
+      const vw = video.videoWidth;
+      const vh = video.videoHeight;
+      if (!vw || !vh) return;
+      const cssW = window.innerWidth;
+      const cssH = window.innerHeight;
+      const scale = Math.max(cssW / vw, cssH / vh);
+      ctx.globalAlpha = 1;
+      ctx.drawImage(video, (cssW - vw * scale) / 2, (cssH - vh * scale) / 2, vw * scale, vh * scale);
     };
     const draw = () => {
       lastKey = ""; // force a repaint on the next tick
@@ -184,6 +199,27 @@ export default function ScrubBackground() {
       if (ready && frames > 0 && !document.hidden) {
         const pos = (reducedMotion ? CFG.reducedMotionFrame : progress.current) * (frames - 1);
         const f = Math.min(Math.max(pos, 0), frames - 1);
+
+        // Fast forward scroll: play the video natively at a rate matched to the scroll
+        // (as smooth as real video), steering toward the exact position. Slow, reverse
+        // or stopped scrolling falls through to the frame-accurate blend below.
+        const framesPerSec = smooth.getVelocity() * (frames - 1);
+        const lead = (f + 0.5) / CFG.fps - video.currentTime;
+        if (!reducedMotion && framesPerSec > CFG.playMinFps && lead > 0) {
+          video.playbackRate = Math.min(CFG.maxRate, Math.max(0.5, framesPerSec / CFG.fps + lead * CFG.catchUp));
+          if (video.paused) void video.play().catch(() => {});
+          playing = true;
+          if (video.readyState >= 2) paintVideo();
+          lastKey = "";
+          rafId = requestAnimationFrame(tick);
+          return;
+        }
+        if (playing) {
+          video.pause();
+          playing = false;
+          seekingFrame = -1;
+        }
+
         const i = Math.floor(f);
         const j = Math.min(i + 1, frames - 1);
         const raw = reducedMotion ? 0 : f - i;
