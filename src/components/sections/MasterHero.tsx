@@ -36,12 +36,6 @@ export default function MasterHero() {
     { icon: ShieldCheck, he: "דיסקרטיות מלאה", en: "Full Discretion" },
     { icon: Scale, he: "מאות תיקים", en: "Hundreds of Cases" },
   ];
-  const stats = [
-    { he: "5+ שנות ניסיון", en: "5+ years' experience" },
-    { he: "מאות לקוחות", en: "Hundreds of clients" },
-    { he: "הפטר ומחיקת חובות", en: "Discharge & debt erasure" },
-  ];
-
   return (
     <section id="home" ref={ref} className="relative min-h-screen w-full overflow-x-clip">
       {/* Background */}
@@ -73,13 +67,15 @@ export default function MasterHero() {
         initial="hidden"
         animate="visible"
         style={{ opacity: contentOpacity, y: contentY }}
-        className="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col justify-center px-6 py-32 lg:px-10"
+        className="relative z-10 flex min-h-screen flex-col justify-center px-4 pb-16 pt-32"
       >
-        <div className="hero-glass max-w-2xl rounded-[2rem] p-5 text-start sm:p-10">
+        {/* ponytail: same frame as the navbar (px-4 + max-w-6xl) so the panel edge lines up with it */}
+        <div className="mx-auto w-full max-w-6xl">
+        <div className="hero-glass max-w-2xl rounded-[2rem] p-5 text-start sm:p-8 2xl:p-10">
           {/* Eyebrow */}
           <motion.p
             variants={item}
-            className="text-shadow-lux text-xs font-normal tracking-[0.35em] text-gold/90 sm:text-sm"
+            className="text-shadow-lux text-sm font-normal tracking-[0.18em] text-gold/90"
           >
             {t("שיקום כלכלי · חדלות פירעון · הסדרי חובות", "Economic Recovery · Insolvency · Debt Settlements")}
           </motion.p>
@@ -89,9 +85,9 @@ export default function MasterHero() {
             {badges.map((b) => (
               <span
                 key={b.en}
-                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-3.5 py-1.5 text-xs font-normal text-ink/90 backdrop-blur-sm"
+                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.04] px-4 py-2 text-sm font-normal text-ink/90"
               >
-                <b.icon className="h-3.5 w-3.5 text-gold" strokeWidth={1.6} />
+                <b.icon className="h-4 w-4 text-gold" strokeWidth={1.6} />
                 {t(b.he, b.en)}
               </span>
             ))}
@@ -100,7 +96,7 @@ export default function MasterHero() {
           {/* Headline (Option A) */}
           <motion.h1
             variants={item}
-            className="mt-7 font-serif text-4xl font-bold leading-[1.1] text-[#f4ecdd] [text-shadow:0_2px_24px_rgba(0,0,0,0.8)] sm:text-6xl lg:text-7xl"
+            className="mt-7 font-serif text-4xl font-bold leading-[1.1] text-[#f4ecdd] [text-shadow:0_2px_24px_rgba(0,0,0,0.8)] sm:text-6xl 2xl:text-7xl"
           >
             {t("מחזירים לך את", "We give you back")}{" "}
             <span className="mt-1 block gold-text">
@@ -155,25 +151,13 @@ export default function MasterHero() {
           </motion.div>
 
           {/* Microcopy */}
-          <motion.p variants={item} className="text-shadow-lux mt-5 text-xs font-normal tracking-wide text-muted">
+          <motion.p variants={item} className="text-shadow-lux mt-5 text-sm font-normal text-muted">
             {t(
               "ייעוץ ראשוני ללא עלות · ללא התחייבות · בדיסקרטיות מלאה",
               "Free initial consultation · No obligation · Fully confidential",
             )}
           </motion.p>
-
-          {/* Stat strip */}
-          <motion.div
-            variants={item}
-            className="mt-10 flex max-w-xl flex-wrap items-center gap-x-8 gap-y-4 border-t border-white/10 pt-7"
-          >
-            {stats.map((s) => (
-              <div key={s.en} className="flex items-center gap-2.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-gold" />
-                <span className="text-sm font-medium text-ink/90">{t(s.he, s.en)}</span>
-              </div>
-            ))}
-          </motion.div>
+        </div>
         </div>
       </motion.div>
     </section>
